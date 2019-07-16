@@ -1,10 +1,10 @@
-##CBASS_ITS2
+## CBASS_ITS2
 This directory contains the python script that was used to plot the ITS2 figures and map for the CBASS84 manuscript.
 
-###Python3 virtual environment setup
+### Python3 virtual environment setup
 The python3 requirements to setup a python3 virtual environment suitable for running the script can be found in [requirements.txt](requirements.txt).
 
-###Data input requirements for the sequence and profile figure
+### Data input requirements for the sequence and profile figure
 The script uses data as output from the SymPortal analysis in which the CBASS84 sequencing data was run.
 Namely, the following inputs files are required and should be placed in the following directory structure:
 #### In `CBASS84/CBASS84_ITS2/84/input`:
@@ -24,12 +24,12 @@ The between-profile distances (Bray-Curtis derived) and calculated PCoA coordina
 * 2019-02-21_08-04-43.255493.bray_curtis_within_clade_profile_distances_A.dist
 * 2019-02-21_08-04-43.255493.bray_curtis_profiles_PCoA_coords_A.csv
 
-###Data input requirements for the map figure
+### Data input requirements for the map figure
 Whilst much of the data required to plot the map figure is downloaded directly from the [Natural Earth Features](https://www.naturalearthdata.com/features/) resource, some additional GIS data is required for plotting the reef outlines on the map.
 #### In `CBASS84/CBASS84_ITS2/84/input/gis`:
 The set of 32 .kml files representing reef locations and the .kml file representing the KAUST coastline.
 
-###Script output
+### Script output
 The script contains code for creating two figures. 
 
 To create the ITS2 sequence figures the following lines at the bottom of the script should be run: 
@@ -45,13 +45,13 @@ mwif.draw_map()
 Each of these functions will produce a set of .svg and .png (dpi=1200) figures.
 
 The output .svgs are as follows:
-####The ITS2 figure
+#### The ITS2 figure
 As output from the code:
 ![](svg_figs_for_md_doc/eighty_four_sample_profile_dists_and_seq_info.svg)
 Final for ms:
 ![](svg_figs_for_md_doc/84_zooxs_fig.svg)
 
-####The map figure
+#### The map figure
 As output from the code:
 ![](svg_figs_for_md_doc/eighty_four_map.svg)
 
