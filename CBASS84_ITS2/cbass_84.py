@@ -125,7 +125,7 @@ class SampleOrdinationFigure:
         print('saving .png')
         plt.savefig(os.path.join(self.fig_out_path, 'eighty_four_sample_profile_dists_and_seq_info.png'), dpi=1200)
         print('saving .svg')
-        plt.savefig(os.path.join(self.fig_out_path, 'eighty_four_map_pcoa_sample_type_site.svg'), dpi=1200)
+        plt.savefig(os.path.join(self.fig_out_path, 'eighty_four_sample_profile_dists_and_seq_info.svg'))
 
     def _seq_and_type_plotting_site_ordered(self):
         sample_order = self._get_sample_order()
@@ -820,7 +820,14 @@ class MapWthInsetFigure:
         self.root_dir = os.path.dirname(os.path.realpath(__file__))
         self.input_base_dir = os.path.join(self.root_dir, '84', 'input')
         self.gis_input_base_path = os.path.join(self.input_base_dir, 'gis')
-        self.large_map_ax = plt.figure(figsize=(8, 5))
+        self.fig = plt.figure(figsize=(8,5))
+        self.large_map_ax = plt.subplot(projection=ccrs.PlateCarree(), zorder=1)
+        self.sites_location_dict = {'eilat': (34.934402, 29.514673), 'kaust': (38.960234, 22.303411),
+                                    'exposed': (39.04470, 22.270300), 'protected': (39.051982, 22.26900)}
+        self.site_marker_dict = {'eilat': '+', 'kaust': '^', 'protected': 'o', 'exposed': 's'}
+        # figure output
+        self.fig_out_path = os.path.join(self.root_dir, '84', 'figures')
+        os.makedirs(self.fig_out_path, exist_ok=True)
 
     def draw_map(self):
         self.large_map_ax.set_extent(extents=(33.0, 41.0, 22.0, 30.0))
@@ -859,6 +866,11 @@ class MapWthInsetFigure:
         poly_xs = self._add_legend_bbox()
 
         self._populate_map_legend()
+
+        print('saving .png')
+        plt.savefig(os.path.join(self.fig_out_path, 'eighty_four_map.png'), dpi=1200)
+        print('saving .svg')
+        plt.savefig(os.path.join(self.fig_out_path, 'eighty_four_map.svg'))
 
     def _get_naural_earth_features_big_map(self):
         land_110m = cartopy.feature.NaturalEarthFeature(category='physical', name='land',
@@ -960,7 +972,7 @@ class MapWthInsetFigure:
         leg_xs = [33.6]
         leg_ys = [22 + 8 / 5, 22 + 6 / 5, 22 + 4 / 5, 22 + 2 / 5]
         for i, site in enumerate(['eilat', 'kaust', 'exposed', 'protected']):
-            if site != 'protected':
+            if site != 'eilat':
                 self.large_map_ax.plot(leg_xs[0], leg_ys[i], self.site_marker_dict[site], markerfacecolor='white',
                                        markeredgecolor='black', markersize=6, zorder=4)
             else:
@@ -1022,7 +1034,7 @@ class MapWthInsetFigure:
             markerfacecolor='white', markeredgecolor='black', markersize=8)
         small_map_ax.plot(
             annotation_xs[2], annotation_y, self.site_marker_dict['protected'],
-            markerfacecolor='black', markeredgecolor='black', markersize=8)
+            markerfacecolor='white', markeredgecolor='black', markersize=8)
         return annotation_xs, annotation_y
 
     def _reposition_inset(self, small_map_ax):
@@ -1089,9 +1101,9 @@ class MapWthInsetFigure:
 
     def _position_and_draw_inset_axis(self):
         # making a smal axis
-        dis_data = self.large_map_ax.transData.transform([(37.0, 26.0), (41.0, 30.0)])
+        display_coordinates = self.large_map_ax.transData.transform([(37.0, 26.0), (41.0, 30.0)])
         inv = self.fig.transFigure.inverted()
-        fig_data = inv.transform(dis_data)
+        fig_data = inv.transform(display_coordinates)
         width = fig_data[1][0] - fig_data[0][0]
         height = fig_data[1][1] - fig_data[0][1]
         small_map_ax = self.fig.add_axes([fig_data[0][0], fig_data[0][1], width, height], zorder=2,
@@ -1166,6 +1178,8 @@ class TranscriptomicsFigure:
             tot += abs(val)
         return tot
 
-sof = SampleOrdinationFigure()
-sof.plot_ordination_figure()
+mwif = MapWthInsetFigure()
+mwif.draw_map()
+# sof = SampleOrdinationFigure()
+# sof.plot_ordination_figure()
 # sof.print_out_sample_id_list()
