@@ -48,6 +48,7 @@ The output .svgs are as follows:
 #### The ITS2 figure
 As output from the code:
 ![](svg_figs_for_md_doc/eighty_four_sample_profile_dists_and_seq_info.svg)
+
 Final for ms:
 ![](svg_figs_for_md_doc/84_zooxs_fig.svg)
 
