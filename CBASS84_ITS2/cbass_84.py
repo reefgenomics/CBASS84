@@ -22,6 +22,7 @@ from matplotlib.patches import Rectangle, Polygon, Arrow
 from matplotlib.collections import PatchCollection
 from matplotlib.colors import ListedColormap
 import numpy as np
+import pickle
 
 
 
@@ -38,7 +39,6 @@ class SampleOrdinationFigure:
         self.sample_name_to_sample_uid_dict = None
         self.sample_dist_df = self._make_sample_dist_df()
         self.sample_pcoa_df = self._make_sample_pcoa_df()
-
 
         # Btwn type distances
         self.distance_base_dir_types = os.path.join(self.input_base_dir, 'between_profiles', 'A')
@@ -115,7 +115,6 @@ class SampleOrdinationFigure:
 
         self._plot_pcoa(ax=self.pc1_pc2_sample_dist_ax, pc='PC2')
         self._plot_pcoa(ax=self.pc1_pc3_sample_dist_ax, pc='PC3')
-        # self._plot_pc1_pc3_sample_dists(color_list, marker_list, x_list)
 
         self._plot_type_dists(ax=self.pc1_pc2_profile_dist_ax, second_pc_label='PC2', second_pc_var_explained='20.6')
         self._plot_type_dists(ax=self.pc1_pc3_profile_dist_ax, second_pc_label='PC3', second_pc_var_explained='11.9')
@@ -129,16 +128,16 @@ class SampleOrdinationFigure:
         plt.savefig(os.path.join(self.fig_out_path, 'eighty_four_sample_profile_dists_and_seq_info.svg'))
 
     def _seq_and_type_plotting_site_ordered(self):
-        sample_order = self._get_sample_order()
-        self._plot_seq_and_type_ax_site_ordered(sample_order)
+        # sample_order = self._get_sample_order()
+        # Samples have been ordered when the meta df was made
+        self._plot_seq_and_type_ax_site_ordered()
         self._plot_seq_and_type_legend(ax=self.sample_seq_info_legend_axarr[0])
         self._plot_seq_and_type_legend(ax=self.sample_seq_info_legend_axarr[1], type_plotting=True)
 
-    def _plot_seq_and_type_ax_site_ordered(self, sample_order):
+    def _plot_seq_and_type_ax_site_ordered(self):
         # We plot the first 55 because this is clean break in the ITS2 type profiles
         for i, site in enumerate(self.sites):
-            # ordered sample list should be the samples of the site in the order of sample_order
-            ordered_sample_list = [sample_uid for sample_uid in sample_order if self.meta_df.at[self.sample_uid_to_sample_name_dict[sample_uid], 'site'] == site]
+            ordered_sample_list = [self.sample_name_to_sample_uid_dict[_] for _ in self.meta_df[self.meta_df['site'] == site].index]
             num_sampls_first_plot = len(ordered_sample_list)
             width = 1 / num_sampls_first_plot
             if i == 1 or i == 3:
@@ -156,24 +155,9 @@ class SampleOrdinationFigure:
         leg_plotter = self.LegendPlotter(parent_plotter=self, ax=ax, type_plotting=type_plotting)
         leg_plotter.plot_legend_seqs()
 
-    def _plot_seq_and_type_ax_type_ordered(self, sample_order):
-        # We plot the first 55 because this is clean break in the ITS2 type profiles
-        num_sampls_first_plot = 55
-        width = 1 / num_sampls_first_plot
-        self._plot_seqs_on_ax(
-            ordered_sample_list=sample_order[:num_sampls_first_plot],
-            ax=self.sample_seq_info_axarr[0],
-            width=width,
-            x_ind_list=[i * width for i in range(num_sampls_first_plot)],
-            num_samples_in_first_plot=num_sampls_first_plot)
-        self._plot_seqs_on_ax(
-            ordered_sample_list=sample_order[num_sampls_first_plot:],
-            ax=self.sample_seq_info_axarr[1],
-            width=width,
-            x_ind_list=[i * width for i in range(len(sample_order) - num_sampls_first_plot)],
-            num_samples_in_first_plot=num_sampls_first_plot)
-
     def _get_sample_order(self):
+        # TODO we need to change the order of the samples so that they are ordered according to colony and
+        # then by temperature
         sample_plotting_order_matrix = [[[] for _ in range(len(self.sites))] for _ in
                                         range(len(self.ordered_prof_names))]
         # We will order the samples by mostabund type profile and then by site
@@ -189,7 +173,6 @@ class SampleOrdinationFigure:
         return sample_order
 
     def _plot_pcoa(self, ax, pc='PC2'):
-
         for site in self.meta_df['site'].unique():
             samples = [self.sample_name_to_sample_uid_dict[_] for _ in self.meta_df[self.meta_df['site'] == site].index]
             ax.scatter(
@@ -228,34 +211,6 @@ class SampleOrdinationFigure:
         ax.set_ylabel(f'{second_pc_label} - {second_pc_var_explained}%')
         return
 
-
-
-    def _plot_profs_on_ax(self, ordered_sample_list, ax, width, x_ind_list):
-        ax.set_xlim(0, 1)
-        ax.set_ylim(-0.03, 1)
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
-        ax.spines['bottom'].set_visible(False)
-        ax.set_xticks([])
-        ax.plot([x_ind_list[0], x_ind_list[-1]+width], [0,0], 'k-', linewidth=ax.spines['right']._linewidth)
-
-        patches_list = []
-        color_list = []
-        for sample_uid, x_ind in zip(ordered_sample_list, x_ind_list):
-            # for each sample we will start at 0 for the y and then add the height of each bar to this
-            bottom = 0
-            # for each sequence, create a rect patch
-            # the rect will be 1 in width and centered about the ind value.
-            non_zero_sample_series, sample_total = self._get_sample_type_info(sample_uid)
-            for ser_index, rel_abund in non_zero_sample_series.iteritems():
-                height = rel_abund / sample_total
-                patches_list.append(Rectangle(
-                    (x_ind, bottom), width,
-                    height, color=self.prof_color_dict[ser_index]))
-                bottom += height
-                color_list.append(self.prof_color_dict[ser_index])
-        self._add_seq_and_type_rects_to_axis(ax, color_list, patches_list)
-
     def _plot_seqs_on_ax(self, ordered_sample_list, ax, width, x_ind_list, num_samples_in_first_plot, y_lab=True, site=None):
         prof_depth = self.format_seq_type_axis(ax, num_samples_in_first_plot, ordered_sample_list, width, x_ind_list, y_lab)
 
@@ -281,42 +236,11 @@ class SampleOrdinationFigure:
 
         self._add_seq_and_type_rects_to_axis(ax, color_list, patches_list)
 
-
     def _add_seq_and_type_rects_to_axis(self, ax, color_list, patches_list):
         listed_colour_map = ListedColormap(color_list)
         patches_collection = PatchCollection(patches_list, cmap=listed_colour_map)
         patches_collection.set_array(np.arange(len(patches_list)))
         ax.add_collection(patches_collection)
-
-    def _annotate_site_designation_info_last(self, ax, current_site, line_y_val, point_y_val, start_point, type_count,
-                                             x_ind_list):
-        type_count += 1
-        self._plot_site_desig_line_and_point(ax, current_site, line_y_val, point_y_val, start_point,
-                                             type_count, x_ind_list[-1] + (x_ind_list[-1] - x_ind_list[-2]))
-
-    def _annotate_site_designation_info(self, ax, current_site, line_y_val, point_y_val, sample_uid, start_point,
-                                        type_count, x_ind):
-        site = self.meta_df.loc[self.sample_uid_to_sample_name_dict[sample_uid], 'site']
-        if site != current_site:
-
-            if start_point is not None:  # if point in list then add new and plot line then add new start point
-                type_count += 1
-                self._plot_site_desig_line_and_point(ax, current_site, line_y_val, point_y_val, start_point,
-                                                     type_count, x_ind)
-                start_point = x_ind
-                current_site = site
-            else:  # this was the first one and we should simply add the start point
-                current_site = site
-                start_point = x_ind
-        return current_site, start_point, type_count
-
-    def _init_site_designation_annotation_info(self):
-        start_point = None
-        current_site = 'foo'
-        type_count = 1
-        line_y_val = [-0.325, -0.375]
-        point_y_val = [-0.425, -0.475]
-        return current_site, line_y_val, point_y_val, start_point, type_count
 
     def _add_type_rects_to_patches_list(self, color_list, non_zero_sample_series, patches_list, prof_depth,
                                         sample_total, width, x_ind):
@@ -360,8 +284,12 @@ class SampleOrdinationFigure:
         ax.spines['right'].set_visible(False)
         ax.spines['bottom'].set_visible(False)
         ax.spines['left'].set_visible(False)
-        ax.set_xticks([])
+        ax.set_xticks([(_*width)+(0.5*width) for _ in range(len(ordered_sample_list))])
+        ax.set_xticklabels([self.meta_df.at[self.sample_uid_to_sample_name_dict[_], 'label'] for _ in ordered_sample_list], rotation=90, fontsize=4)
+        ax.tick_params(axis='x', length=0)
+        # ax.set_xticks([])
         ax.set_yticks([])
+        ax.set_ylim((-1/3, 1))
         ax.plot([x_ind_list[0], x_ind_list[-1] + width], [0, 0], 'k-', linewidth=ax.spines['right']._linewidth)
         if y_lab:
             ax.text(x=-0.05, y=0.5, s='ITS2 sequences', horizontalalignment='center', verticalalignment='center',
@@ -485,45 +413,74 @@ class SampleOrdinationFigure:
                     current_val_lon = df['collection_longitude'][sample_name]
                     df.iat[i, 10] = float(current_val_lon[2:-1])
         df = df.loc[wanted_sample_names,:]
-        # make a new columns that is site name
+        # make a columns that are site, colony and temperature
         site_name = []
+        colony = []
+        temperature = []
+        label = []
         for i, sample_name in enumerate(df.index.values.tolist()):
             if df['collection_latitude'][sample_name] == 29.514673:
                 site_name.append('Eilat')
+                colony.append(int(sample_name.split('_')[0].replace('ES', '')))
+                temperature.append(int(sample_name.split('_')[-1][:-1]))
             elif df['collection_latitude'][sample_name] == 22.26302:
                 site_name.append('Protected')
+                colony.append(int(sample_name.split('_')[0].replace('S', '')))
+                temperature.append(int(sample_name.split('_')[-1][:-1]))
             elif df['collection_latitude'][sample_name] == 22.26189:
                 site_name.append('Exposed')
+                colony.append(int(sample_name.split('_')[0].replace('S', '')))
+                temperature.append(int(sample_name.split('_')[-1][:-1]))
             elif df['collection_latitude'][sample_name] == 22.303411:
                 site_name.append('KAUST')
+                colony.append(int(sample_name.split('_')[0].replace('KS', '')))
+                temperature.append(int(sample_name.split('_')[-1][:-1]))
             else:
                 sys.exit('Mismatch in latitude')
+            label.append(sample_name.replace('_', '-'))
         df['site'] = site_name
-
+        df['colony'] = colony
+        df['temperature'] = temperature
+        df['label'] = label
+        df.sort_values(['site', 'colony', 'temperature'], axis=0, inplace=True)
         return df
 
     # Colour methods
     def _get_hardcoded_profile_colours_84(self):
-        return {'A1-A1z': '#88aac3', 'A1-A1dv-A1dw-A1dl': '#ed90ba', 'A1g/A1-A1l-A1cr-A1o-A1dp-A1p-A1dq-A1dn': '#c0d2ab',
-         'A1-A1ds-A1z-A1dr-A1bh': '#a3eaf6', 'A1-A1dm': '#baa1f6', 'A1/A1cl-A1z': '#80f093', 'A1-A1z-A1do': '#a48684',
-         'A1-A1du-A1z-A1ds-A1dr': '#fec685', 'A1-A1ea': '#fcfbb5'}
+        """
+        Update I have output a dict of the profile colours used in the cbass vs classic.
+        :return:
+        """
+        cbass_classic_prof_color_dict = pickle.load(open(os.path.join(self.input_base_dir, 'prof_c_dict.p'), 'rb'))
+        cbass_classic_prof_color_dict.update({'A1-A1dv-A1dw-A1dl':'#baa1f6', 'A1/A1cl-A1z':'#c0d2ab', 'A1-A1ea': '#fcfbb5'})
+        return cbass_classic_prof_color_dict
+
+        # return {'A1-A1z': '#88aac3', 'A1-A1dv-A1dw-A1dl': '#ed90ba', 'A1g/A1-A1l-A1cr-A1o-A1dp-A1p-A1dq-A1dn': '#c0d2ab',
+        #  'A1-A1ds-A1z-A1dr-A1bh': '#a3eaf6', 'A1-A1dm': '#baa1f6', 'A1/A1cl-A1z': '#80f093', 'A1-A1z-A1do': '#a48684',
+        #  'A1-A1du-A1z-A1ds-A1dr': '#fec685', 'A1-A1ea': '#fcfbb5'}
 
     def _set_seq_colour_dict(self):
         """Create the colour dictionary that will be used for plotting by assigning a colour from the colour_palette
         to the most abundant seqs first and after that cycle through the grey_pallette assigning colours
         If we are only going to have a legend that is cols x rows as shown below, then we should only use
-        that many colours in the plotting."""
+        that many colours in the plotting.
+
+        Update: I have pickled out the seq and profile colour dicts from the cbass vs classic paper"""
+        cbass_classic_seq_color_dict = pickle.load(open(os.path.join(self.input_base_dir, 'seq_c_dict.p'), 'rb'))
         temp_colour_dict = {}
         predefined_colour_dict = self._get_pre_def_colour_dict()
 
-        for seq_name, color_hash in predefined_colour_dict.items():
-            if seq_name in self.ordered_seq_names:
-                temp_colour_dict[seq_name] = color_hash
+        for seq_name in self.ordered_seq_names:
+            if seq_name in cbass_classic_seq_color_dict:
+                temp_colour_dict[seq_name] = cbass_classic_seq_color_dict[seq_name]
+            elif seq_name in predefined_colour_dict:
+                temp_colour_dict[seq_name] = predefined_colour_dict[seq_name]
 
         colour_palette, grey_palette = self._get_colour_lists()
 
-        remaining_seqs = [seq for seq in self.ordered_seq_names if seq not in predefined_colour_dict.keys()]
-
+        remaining_seqs = [seq for seq in self.ordered_seq_names if seq not in temp_colour_dict]
+        used_colors = list(temp_colour_dict.values())
+        colour_palette = [_ for _ in colour_palette if _ not in used_colors]
         for i, seq_name in enumerate(remaining_seqs):
             if i < len(colour_palette):
                 temp_colour_dict[seq_name] = colour_palette[i]
