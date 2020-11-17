@@ -1,3 +1,4 @@
+#original script by Dan Barshis
 setwd("/Users/...")
 library(emmeans)
 library(drc)
