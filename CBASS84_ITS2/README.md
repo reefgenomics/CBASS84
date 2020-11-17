@@ -47,10 +47,10 @@ Each of these functions will produce a set of .svg and .png (dpi=1200) figures.
 The output .svgs are as follows:
 #### The ITS2 figure
 As output from the code:
-![](svg_figs_for_md_doc/eighty_four_sample_profile_dists_and_seq_info.svg)
+![](svg_figs_for_md_doc/eighty_four_sample_profile_dists_and_seq_info_updated_samplenames.svg)
 
 Final for ms:
-![](svg_figs_for_md_doc/84_zooxs_fig.svg)
+![](svg_figs_for_md_doc/eighty_four_sample_profile_dists_and_seq_info_illustrator_updated_samplenames.svg)
 
 #### The map figure
 As output from the code:
