@@ -778,15 +778,30 @@ class MapWthInsetFigure:
         # figure output
         self.fig_out_path = os.path.join(self.root_dir, '84', 'figures')
         os.makedirs(self.fig_out_path, exist_ok=True)
+        self.reef_shape_file_path = os.path.join(self.gis_input_base_path, '14_001_WCMC008_CoralReefs2018_v4/01_Data/WCMC008_CoralReef2018_Py_v4.shp')
+
+    def _trim_reader(self, reader):
+        new_data = []
+        for r in reader.records():
+            if 'SAU' in r.attributes['ISO3']:
+                new_data.append(r)
+        reader._data = new_data
+        return reader
 
     def draw_map(self):
         self.large_map_ax.set_extent(extents=(33.0, 41.0, 22.0, 30.0))
+
+
         land_110m, ocean_110m, boundary_110m = self._get_naural_earth_features_big_map()
         print('drawing annotations on big map')
         self._draw_natural_earth_features_big_map(land_110m, ocean_110m, boundary_110m)
         print('big map annotations complete')
         self._put_gridlines_on_large_map_ax()
         self._annotate_map_with_sites()
+        # We are going to work with this data set for the reefs
+        # https://data.unep-wcmc.org/datasets/1
+        # We are modifying the code from the Restrepo et al paper that I wrote
+        self._add_reefs_big_map()
         # self.zoom_map_ax.set_extent(extents=(38.75, 39.25, 22, 22.5))
         # land_10m, ocean_10m = self._get_naural_earth_features_zoom_map()
         # self._draw_natural_earth_features_zoom_map(land_10m, ocean_10m)
@@ -818,9 +833,28 @@ class MapWthInsetFigure:
         self._populate_map_legend()
 
         print('saving .png')
-        plt.savefig(os.path.join(self.fig_out_path, 'eighty_four_map.png'), dpi=600)
+        plt.savefig(os.path.join(self.fig_out_path, 'eighty_four_map_w_reef_big.png'), dpi=600)
         print('saving .svg')
-        plt.savefig(os.path.join(self.fig_out_path, 'eighty_four_map.svg'))
+        plt.savefig(os.path.join(self.fig_out_path, 'eighty_four_map_w_reef_big.svg'))
+
+    def _add_reefs_big_map(self):
+        from cartopy.io.shapereader import Reader
+        from cartopy.feature import ShapelyFeature
+        # if os.path.exists(os.path.join(self.gis_input_base_path, 'reef_reader_trimmed.p')):
+        #     reader = pickle.load(open(os.path.join(self.gis_input_base_path, 'reef_reader_trimmed.p'), 'rb'))
+        # elif os.path.exists(os.path.join(self.gis_input_base_path, 'reef_reader.p')):
+        #     reader = pickle.load(open(os.path.join(self.gis_input_base_path, 'reef_reader.p'), 'rb'))
+        #     reader = self._trim_reader(reader)
+        #     pickle.dump(reader, open(os.path.join(self.parent.cache_dir, 'reef_reader_trimmed'), 'wb'))
+        # else:
+        reader = Reader(self.reef_shape_file_path)
+        # pickle.dump(reader, open(os.path.join(self.gis_input_base_path, 'reef_reader.p'), 'wb'))
+        # reader = self._trim_reader(reader)
+        # pickle.dump(reader, open(os.path.join(self.gis_input_base_path, 'reef_reader_trimmed.p'), 'wb'))
+        geom = reader.geometries()
+        shap_f = ShapelyFeature(geom, ccrs.PlateCarree(), edgecolor='red', linewidth=0.5)
+        # self.large_map_ax.add_feature(shap_f, facecolor='red', zorder=2)
+        self.large_map_ax.add_feature(shap_f, facecolor='red')
 
     def _get_naural_earth_features_big_map(self):
         land_110m = cartopy.feature.NaturalEarthFeature(category='physical', name='land',
@@ -1045,7 +1079,7 @@ class MapWthInsetFigure:
             x_s = [_[0] for _ in x_y_tups_of_feature]
             y_s = [_[1] for _ in x_y_tups_of_feature]
             poly_xy = [[x, y] for x, y in zip(x_s, y_s)]
-            reef_poly = Polygon(poly_xy, closed=True, fill=True, edgecolor='None', color='red', alpha=0.2)
+            reef_poly = Polygon(poly_xy, closed=True, fill=True, edgecolor='None', color='red', alpha=1)
             small_map_ax.add_patch(reef_poly)
 
     def _add_land_and_sea_to_inset(self, small_map_ax, small_x0, small_x1, small_y0, small_y1):
@@ -1145,6 +1179,6 @@ class TranscriptomicsFigure:
 
 mwif = MapWthInsetFigure()
 mwif.draw_map()
-sof = SampleOrdinationFigure()
-sof.plot_ordination_figure()
-sof.print_out_sample_id_list()
+# sof = SampleOrdinationFigure()
+# sof.plot_ordination_figure()
+# sof.print_out_sample_id_list()
