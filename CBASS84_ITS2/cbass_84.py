@@ -5,7 +5,7 @@ publication of what I believe is the cbass_84 data set.
 import os
 import pandas as pd
 import matplotlib as mpl
-mpl.use('Agg')
+mpl.use('TKAgg')
 import matplotlib.pyplot as plt
 # NB the pip cartopy install seems to be broken as it doesn't install the required libararies.
 # The solution was to install using conda. conda install cartopy.
@@ -760,7 +760,8 @@ class MapWthInsetFigure:
         self.large_map_ax = plt.subplot(projection=ccrs.PlateCarree(), zorder=1)
         self.sites_location_dict = {'Eilat': (34.934402, 29.514673), 'KAUST': (38.960234, 22.303411),
                                     'Exposed': (39.04470, 22.270300), 'Protected': (39.051982, 22.26900)}
-        self.site_marker_dict = {'Eilat': '+', 'KAUST': '^', 'Protected': 'o', 'Exposed': 's'}
+        self.site_marker_dict = {'Eilat': 'o', 'KAUST': '^', 'Protected': 'D', 'Exposed': 's' }
+        self.site_color_dict = {'Eilat': '#427bb4', 'KAUST': '#e6a964', 'Exposed': '#d863af', 'Protected': '#87163e'}
         # figure output
         self.fig_out_path = os.path.join(self.root_dir, '84', 'figures')
         os.makedirs(self.fig_out_path, exist_ok=True)
@@ -804,7 +805,7 @@ class MapWthInsetFigure:
         self._populate_map_legend()
 
         print('saving .png')
-        plt.savefig(os.path.join(self.fig_out_path, 'eighty_four_map.png'), dpi=1200)
+        plt.savefig(os.path.join(self.fig_out_path, 'eighty_four_map.png'), dpi=600)
         print('saving .svg')
         plt.savefig(os.path.join(self.fig_out_path, 'eighty_four_map.svg'))
 
@@ -827,7 +828,9 @@ class MapWthInsetFigure:
 
     def _draw_natural_earth_features_big_map(self, land_110m, ocean_110m, boundary_110m):
         """NB the RGB must be a tuple in a list and the R, G, B must be given as a value between 0 and 1"""
-        self.large_map_ax.add_feature(land_110m, facecolor=[(238 / 255, 239 / 255, 219 / 255)],
+        # self.large_map_ax.add_feature(land_110m, facecolor=[(238 / 255, 239 / 255, 219 / 255)],
+        #                               edgecolor='black', linewidth=0.2)
+        self.large_map_ax.add_feature(land_110m, facecolor='white',
                                       edgecolor='black', linewidth=0.2)
         self.large_map_ax.add_feature(ocean_110m, facecolor=[(136 / 255, 182 / 255, 224 / 255)],
                                       edgecolor='black', linewidth=0.2)
@@ -888,7 +891,7 @@ class MapWthInsetFigure:
         for site in ['Eilat']:
             if site != 'Protected':
                 self.large_map_ax.plot(self.sites_location_dict[site][0], self.sites_location_dict[site][1],
-                                       self.site_marker_dict[site], markerfacecolor='white', markeredgecolor='black',
+                                       self.site_marker_dict[site], markerfacecolor=self.site_color_dict[site], markeredgecolor='none',
                                        markersize=8)
             else:
                 self.large_map_ax.plot(self.sites_location_dict[site][0], self.sites_location_dict[site][1],
@@ -909,11 +912,11 @@ class MapWthInsetFigure:
         leg_ys = [22 + 8 / 5, 22 + 6 / 5, 22 + 4 / 5, 22 + 2 / 5]
         for i, site in enumerate(['Eilat', 'KAUST', 'Exposed', 'Protected']):
             if site != 'Eilat':
-                self.large_map_ax.plot(leg_xs[0], leg_ys[i], self.site_marker_dict[site], markerfacecolor='white',
-                                       markeredgecolor='black', markersize=6, zorder=4)
+                self.large_map_ax.plot(leg_xs[0], leg_ys[i], self.site_marker_dict[site], markerfacecolor=self.site_color_dict[site],
+                                       markeredgecolor='none', markersize=6, zorder=4)
             else:
                 self.large_map_ax.plot(leg_xs[0], leg_ys[i],
-                                       self.site_marker_dict[site], markerfacecolor='black', markeredgecolor='black',
+                                       self.site_marker_dict[site], markerfacecolor=self.site_color_dict[site], markeredgecolor='none',
                                        markersize=6, zorder=4)
             self.large_map_ax.text(leg_xs[0] + 0.75, leg_ys[i], s=site, verticalalignment='center',
                                    horizontalalignment='left', fontsize='x-small')
@@ -960,17 +963,29 @@ class MapWthInsetFigure:
         annotation_y = 22.33
         annotation_xs = [small_x0 + 1 / 6 * (small_x1 - small_x0), small_x0 + 2 / 6 * (small_x1 - small_x0),
                          small_x0 + 3 / 6 * (small_x1 - small_x0)]
+        # # plot the 'kaust point'
+        # small_map_ax.plot(
+        #     annotation_xs[0], annotation_y, self.site_marker_dict['KAUST'],
+        #     markerfacecolor='white', markeredgecolor='black', markersize=8)
+        # # plot exposed
+        # small_map_ax.plot(
+        #     annotation_xs[1], annotation_y, self.site_marker_dict['Exposed'],
+        #     markerfacecolor='white', markeredgecolor='black', markersize=8)
+        # small_map_ax.plot(
+        #     annotation_xs[2], annotation_y, self.site_marker_dict['Protected'],
+        #     markerfacecolor='white', markeredgecolor='black', markersize=8)
+
         # plot the 'kaust point'
         small_map_ax.plot(
             annotation_xs[0], annotation_y, self.site_marker_dict['KAUST'],
-            markerfacecolor='white', markeredgecolor='black', markersize=8)
+            markerfacecolor=self.site_color_dict['KAUST'], markeredgecolor='none', markersize=8)
         # plot exposed
         small_map_ax.plot(
             annotation_xs[1], annotation_y, self.site_marker_dict['Exposed'],
-            markerfacecolor='white', markeredgecolor='black', markersize=8)
+            markerfacecolor=self.site_color_dict['Exposed'], markeredgecolor='none', markersize=8)
         small_map_ax.plot(
             annotation_xs[2], annotation_y, self.site_marker_dict['Protected'],
-            markerfacecolor='white', markeredgecolor='black', markersize=8)
+            markerfacecolor=self.site_color_dict['Protected'], markeredgecolor='none', markersize=8)
         return annotation_xs, annotation_y
 
     def _reposition_inset(self, small_map_ax):
@@ -1026,7 +1041,8 @@ class MapWthInsetFigure:
         poly_xy = [[x, y] for x, y in zip(x_s, y_s)]
         # add top right and bottom right
         poly_xy.extend([[small_x1, small_y0], [small_x1, small_y1]])
-        land_poly = Polygon(poly_xy, closed=True, fill=True, color=(238 / 255, 239 / 255, 219 / 255))
+        # land_poly = Polygon(poly_xy, closed=True, fill=True, color=(238 / 255, 239 / 255, 219 / 255))
+        land_poly = Polygon(poly_xy, closed=True, fill=True, color="white")
         small_map_ax.add_patch(land_poly)
         # now do the seq poly
         poly_xy = [[x, y] for x, y in zip(x_s, y_s)]
@@ -1114,8 +1130,8 @@ class TranscriptomicsFigure:
             tot += abs(val)
         return tot
 
-# mwif = MapWthInsetFigure()
-# mwif.draw_map()
+mwif = MapWthInsetFigure()
+mwif.draw_map()
 sof = SampleOrdinationFigure()
 sof.plot_ordination_figure()
-# sof.print_out_sample_id_list()
+sof.print_out_sample_id_list()
