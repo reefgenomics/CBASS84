@@ -123,9 +123,9 @@ class SampleOrdinationFigure:
 
         plt.tight_layout()
         print('saving .png')
-        plt.savefig(os.path.join(self.fig_out_path, 'eighty_four_sample_profile_dists_and_seq_info.png'), dpi=1200)
+        plt.savefig(os.path.join(self.fig_out_path, 'eighty_four_sample_profile_dists_and_seq_info_updated_samplenames.png'), dpi=1200)
         print('saving .svg')
-        plt.savefig(os.path.join(self.fig_out_path, 'eighty_four_sample_profile_dists_and_seq_info.svg'))
+        plt.savefig(os.path.join(self.fig_out_path, 'eighty_four_sample_profile_dists_and_seq_info_updated_samplenames.svg'))
 
     def _seq_and_type_plotting_site_ordered(self):
         # sample_order = self._get_sample_order()
@@ -156,7 +156,7 @@ class SampleOrdinationFigure:
         leg_plotter.plot_legend_seqs()
 
     def _get_sample_order(self):
-        # TODO we need to change the order of the samples so that they are ordered according to colony and
+        # we need to change the order of the samples so that they are ordered according to colony and
         # then by temperature
         sample_plotting_order_matrix = [[[] for _ in range(len(self.sites))] for _ in
                                         range(len(self.ordered_prof_names))]
@@ -285,7 +285,13 @@ class SampleOrdinationFigure:
         ax.spines['bottom'].set_visible(False)
         ax.spines['left'].set_visible(False)
         ax.set_xticks([(_*width)+(0.5*width) for _ in range(len(ordered_sample_list))])
-        ax.set_xticklabels([self.meta_df.at[self.sample_uid_to_sample_name_dict[_], 'label'] for _ in ordered_sample_list], rotation=90, fontsize=4)
+        # Chris has asked that we change the sample names
+        # I have provided a .csv that maps the current sample names to the new samples names
+        # Thew new sample name mapping is called self.sample_uid_to_sample_name_dict_updated
+        # ax.set_xticklabels([self.meta_df.at[self.sample_uid_to_sample_name_dict[_], 'label'] for _ in ordered_sample_list], rotation=90, fontsize=4)
+        ax.set_xticklabels(
+            [self.sample_uid_to_sample_name_dict_updated[_] for _ in ordered_sample_list],
+            rotation=90, fontsize=4)
         ax.tick_params(axis='x', length=0)
         # ax.set_xticks([])
         ax.set_yticks([])
@@ -327,6 +333,7 @@ class SampleOrdinationFigure:
         df = pd.DataFrame(prof_data)
         self.profile_uid_to_profile_name_dict = {uid:name for uid, name in zip(df.iloc[0,2:].values.tolist(), df.iloc[6, 2:].values.tolist())}
         self.profile_name_to_profile_uid_dict = {name:uid for uid, name in self.profile_uid_to_profile_name_dict.items()}
+
         df.drop(index=list(range(6)), inplace=True)
         df.drop(columns=1, inplace=True)
         df.columns = df.iloc[0]
@@ -359,6 +366,12 @@ class SampleOrdinationFigure:
         df = pd.DataFrame(dist_data)
         self.sample_uid_to_sample_name_dict = {int(uid):name for name, uid in zip(df[0].values.tolist(), df[1].values.tolist())}
         self.sample_name_to_sample_uid_dict = {name:uid for uid, name in self.sample_uid_to_sample_name_dict.items()}
+        # At a later date, Chris changed the file names. To map to these new file names, we create
+        # self.sample_uid_to_sample_name_dict_updated
+        # We will then use this when making the axis labels in the method format_seq_type_axis()
+        with open('new_samplename_mapping.csv', 'r') as f:
+            self.sample_uid_to_sample_name_dict_updated = {int(_.split(',')[0].rstrip()): _.split(',')[2].rstrip() for _ in
+                                                             f}
         df.drop(columns=0, inplace=True)
         df.set_index(keys=1, drop=True, inplace=True)
         df.index = df.index.astype('int')
@@ -1130,8 +1143,8 @@ class TranscriptomicsFigure:
             tot += abs(val)
         return tot
 
-mwif = MapWthInsetFigure()
-mwif.draw_map()
-sof = SampleOrdinationFigure()
-sof.plot_ordination_figure()
-sof.print_out_sample_id_list()
+# mwif = MapWthInsetFigure()
+# mwif.draw_map()
+# sof = SampleOrdinationFigure()
+# sof.plot_ordination_figure()
+# sof.print_out_sample_id_list()
