@@ -103,13 +103,13 @@ class SampleOrdinationFigure:
             plt.subplot(self.sample_seq_info_sub_gs[3:4, 10:19])]
 
         # Info to plot
-        self.sites = ['Eilat', 'KAUST', 'Exposed', 'Protected']
-        self.sites_location_dict = {'Eilat': (34.934402, 29.514673), 'KAUST': (38.960234, 22.303411), 'Exposed': (39.04470, 22.270300), 'Protected':(39.051982,22.26900)}
+        self.sites = ['ICN', 'AF', 'ExT', 'PrT']
+        self.sites_location_dict = {'ICN': (34.934402, 29.514673), 'AF': (38.960234, 22.303411), 'ExT': (39.04470, 22.270300), 'PrT':(39.051982,22.26900)}
 
-        # self.site_color_dict = {'Eilat':'black', 'KAUST': 'white', 'Exposed': 'white', 'Protected':'white'}
-        self.site_color_dict = {'Eilat': '#427bb4', 'KAUST': '#e6a964', 'Exposed': '#d863af', 'Protected': '#87163e'}
+        # self.site_color_dict = {'ICN':'black', 'AF': 'white', 'ExT': 'white', 'PrT':'white'}
+        self.site_color_dict = {'ICN': '#427bb4', 'AF': '#e6a964', 'ExT': '#d863af', 'PrT': '#87163e'}
         # self.sub_plot_profiles_axarr = [plt.subplot(self.sub_plot_gs[1:2, 0:1]), plt.subplot(self.sub_plot_gs[3:4, 0:1])]
-        self.site_marker_dict = {'Eilat': 'o', 'KAUST': '^', 'Protected': 'D', 'Exposed': 's' }
+        self.site_marker_dict = {'ICN': 'o', 'AF': '^', 'PrT': 'D', 'ExT': 's' }
 
     def plot_ordination_figure(self):
 
@@ -309,7 +309,7 @@ class SampleOrdinationFigure:
         # plot the line
         ax.plot([start_point, x_ind], [line_y_val[type_count % 2], line_y_val[type_count % 2]], 'k-')
         # plot the point in the middle of the line
-        if current_site == 'Protected':
+        if current_site == 'PrT':
             ax.scatter(start_point + ((x_ind - start_point) / 2), point_y_val[type_count % 2],
                        marker=self.site_marker_dict[current_site],
                        facecolor='black')
@@ -433,19 +433,19 @@ class SampleOrdinationFigure:
         label = []
         for i, sample_name in enumerate(df.index.values.tolist()):
             if df['collection_latitude'][sample_name] == 29.514673:
-                site_name.append('Eilat')
+                site_name.append('ICN')
                 colony.append(int(sample_name.split('_')[0].replace('ES', '')))
                 temperature.append(int(sample_name.split('_')[-1][:-1]))
             elif df['collection_latitude'][sample_name] == 22.26302:
-                site_name.append('Protected')
+                site_name.append('PrT')
                 colony.append(int(sample_name.split('_')[0].replace('S', '')))
                 temperature.append(int(sample_name.split('_')[-1][:-1]))
             elif df['collection_latitude'][sample_name] == 22.26189:
-                site_name.append('Exposed')
+                site_name.append('ExT')
                 colony.append(int(sample_name.split('_')[0].replace('S', '')))
                 temperature.append(int(sample_name.split('_')[-1][:-1]))
             elif df['collection_latitude'][sample_name] == 22.303411:
-                site_name.append('KAUST')
+                site_name.append('AF')
                 colony.append(int(sample_name.split('_')[0].replace('KS', '')))
                 temperature.append(int(sample_name.split('_')[-1][:-1]))
             else:
@@ -771,10 +771,10 @@ class MapWthInsetFigure:
         self.gis_input_base_path = os.path.join(self.input_base_dir, 'gis')
         self.fig = plt.figure(figsize=(8,5))
         self.large_map_ax = plt.subplot(projection=ccrs.PlateCarree(), zorder=1)
-        self.sites_location_dict = {'Eilat': (34.934402, 29.514673), 'KAUST': (38.960234, 22.303411),
-                                    'Exposed': (39.04470, 22.270300), 'Protected': (39.051982, 22.26900)}
-        self.site_marker_dict = {'Eilat': 'o', 'KAUST': '^', 'Protected': 'D', 'Exposed': 's' }
-        self.site_color_dict = {'Eilat': '#427bb4', 'KAUST': '#e6a964', 'Exposed': '#d863af', 'Protected': '#87163e'}
+        self.sites_location_dict = {'ICN': (34.934402, 29.514673), 'AF': (38.960234, 22.303411),
+                                    'ExT': (39.04470, 22.270300), 'PrT': (39.051982, 22.26900)}
+        self.site_marker_dict = {'ICN': 'o', 'AF': '^', 'PrT': 'D', 'ExT': 's' }
+        self.site_color_dict = {'ICN': '#427bb4', 'AF': '#e6a964', 'ExT': '#d863af', 'PrT': '#87163e'}
         # figure output
         self.fig_out_path = os.path.join(self.root_dir, '84', 'figures')
         os.makedirs(self.fig_out_path, exist_ok=True)
@@ -901,8 +901,8 @@ class MapWthInsetFigure:
         # self.zoom_map_ax.gridlines(draw_labels=True)
 
     def _annotate_map_with_sites(self):
-        for site in ['Eilat']:
-            if site != 'Protected':
+        for site in ['ICN']:
+            if site != 'PrT':
                 self.large_map_ax.plot(self.sites_location_dict[site][0], self.sites_location_dict[site][1],
                                        self.site_marker_dict[site], markerfacecolor=self.site_color_dict[site], markeredgecolor='none',
                                        markersize=8)
@@ -923,8 +923,8 @@ class MapWthInsetFigure:
     def _populate_map_legend(self):
         leg_xs = [33.6]
         leg_ys = [22 + 8 / 5, 22 + 6 / 5, 22 + 4 / 5, 22 + 2 / 5]
-        for i, site in enumerate(['Eilat', 'KAUST', 'Exposed', 'Protected']):
-            if site != 'Eilat':
+        for i, site in enumerate(['ICN', 'AF', 'ExT', 'PrT']):
+            if site != 'ICN':
                 self.large_map_ax.plot(leg_xs[0], leg_ys[i], self.site_marker_dict[site], markerfacecolor=self.site_color_dict[site],
                                        markeredgecolor='none', markersize=6, zorder=4)
             else:
@@ -947,15 +947,15 @@ class MapWthInsetFigure:
     def _draw_arrows_on_inset(self, annotation_xs, annotation_y, small_map_ax):
         self._annotate_site_arrow_small_map(
             small_map_ax, tail_x=annotation_xs[0], tail_y=annotation_y - 0.01,
-            head_x=self.sites_location_dict['KAUST'][0], head_y=self.sites_location_dict['KAUST'][1],
+            head_x=self.sites_location_dict['AF'][0], head_y=self.sites_location_dict['AF'][1],
             zorder=5, linewidth=0.2)
         self._annotate_site_arrow_small_map(
             small_map_ax, tail_x=annotation_xs[1], tail_y=annotation_y - 0.01,
-            head_x=self.sites_location_dict['Exposed'][0], head_y=self.sites_location_dict['Exposed'][1],
+            head_x=self.sites_location_dict['ExT'][0], head_y=self.sites_location_dict['ExT'][1],
             zorder=5, linewidth=0.2)
         self._annotate_site_arrow_small_map(
             small_map_ax, tail_x=annotation_xs[2], tail_y=annotation_y - 0.01,
-            head_x=self.sites_location_dict['Protected'][0], head_y=self.sites_location_dict['Protected'][1],
+            head_x=self.sites_location_dict['PrT'][0], head_y=self.sites_location_dict['PrT'][1],
             zorder=5, linewidth=0.2)
 
     def _draw_gridlines_on_inset(self, small_map_ax):
@@ -978,27 +978,27 @@ class MapWthInsetFigure:
                          small_x0 + 3 / 6 * (small_x1 - small_x0)]
         # # plot the 'kaust point'
         # small_map_ax.plot(
-        #     annotation_xs[0], annotation_y, self.site_marker_dict['KAUST'],
+        #     annotation_xs[0], annotation_y, self.site_marker_dict['AF'],
         #     markerfacecolor='white', markeredgecolor='black', markersize=8)
         # # plot exposed
         # small_map_ax.plot(
-        #     annotation_xs[1], annotation_y, self.site_marker_dict['Exposed'],
+        #     annotation_xs[1], annotation_y, self.site_marker_dict['ExT'],
         #     markerfacecolor='white', markeredgecolor='black', markersize=8)
         # small_map_ax.plot(
-        #     annotation_xs[2], annotation_y, self.site_marker_dict['Protected'],
+        #     annotation_xs[2], annotation_y, self.site_marker_dict['PrT'],
         #     markerfacecolor='white', markeredgecolor='black', markersize=8)
 
         # plot the 'kaust point'
         small_map_ax.plot(
-            annotation_xs[0], annotation_y, self.site_marker_dict['KAUST'],
-            markerfacecolor=self.site_color_dict['KAUST'], markeredgecolor='none', markersize=8)
+            annotation_xs[0], annotation_y, self.site_marker_dict['AF'],
+            markerfacecolor=self.site_color_dict['AF'], markeredgecolor='none', markersize=8)
         # plot exposed
         small_map_ax.plot(
-            annotation_xs[1], annotation_y, self.site_marker_dict['Exposed'],
-            markerfacecolor=self.site_color_dict['Exposed'], markeredgecolor='none', markersize=8)
+            annotation_xs[1], annotation_y, self.site_marker_dict['ExT'],
+            markerfacecolor=self.site_color_dict['ExT'], markeredgecolor='none', markersize=8)
         small_map_ax.plot(
-            annotation_xs[2], annotation_y, self.site_marker_dict['Protected'],
-            markerfacecolor=self.site_color_dict['Protected'], markeredgecolor='none', markersize=8)
+            annotation_xs[2], annotation_y, self.site_marker_dict['PrT'],
+            markerfacecolor=self.site_color_dict['PrT'], markeredgecolor='none', markersize=8)
         return annotation_xs, annotation_y
 
     def _reposition_inset(self, small_map_ax):
@@ -1143,8 +1143,8 @@ class TranscriptomicsFigure:
             tot += abs(val)
         return tot
 
-# mwif = MapWthInsetFigure()
-# mwif.draw_map()
-# sof = SampleOrdinationFigure()
-# sof.plot_ordination_figure()
-# sof.print_out_sample_id_list()
+mwif = MapWthInsetFigure()
+mwif.draw_map()
+sof = SampleOrdinationFigure()
+sof.plot_ordination_figure()
+sof.print_out_sample_id_list()
