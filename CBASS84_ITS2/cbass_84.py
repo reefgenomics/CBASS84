@@ -765,7 +765,7 @@ class SampleOrdinationFigure:
 
 
 class MapWthInsetFigure:
-    def __init__(self):
+    def __init__(self, full):
         self.root_dir = os.path.dirname(os.path.realpath(__file__))
         self.input_base_dir = os.path.join(self.root_dir, '84', 'input')
         self.gis_input_base_path = os.path.join(self.input_base_dir, 'gis')
@@ -779,7 +779,14 @@ class MapWthInsetFigure:
         self.fig_out_path = os.path.join(self.root_dir, '84', 'figures')
         os.makedirs(self.fig_out_path, exist_ok=True)
         self.reef_shape_file_path = os.path.join(self.gis_input_base_path, '14_001_WCMC008_CoralReefs2018_v4/01_Data/WCMC008_CoralReef2018_Py_v4.shp')
-
+        self.full = full
+        # The constraints for the legend box
+        if self.full:
+            self.leg_poly_xs = [33, 37, 37, 33]
+            self.leg_poly_ys = [14, 14, 18, 18]
+        else:
+            self.leg_poly_xs = [33, 35, 35, 33]
+            self.leg_poly_ys = [22, 22, 24, 24]
     def _trim_reader(self, reader):
         new_data = []
         for r in reader.records():
@@ -789,8 +796,10 @@ class MapWthInsetFigure:
         return reader
 
     def draw_map(self):
-        self.large_map_ax.set_extent(extents=(33.0, 41.0, 22.0, 30.0))
-
+        if self.full:
+            self.large_map_ax.set_extent(extents=(32.0, 45.0, 12.0, 30.0))
+        else:
+            self.large_map_ax.set_extent(extents=(33.0, 41.0, 22.0, 30.0))
 
         land_110m, ocean_110m, boundary_110m = self._get_naural_earth_features_big_map()
         print('drawing annotations on big map')
@@ -801,12 +810,8 @@ class MapWthInsetFigure:
         # We are going to work with this data set for the reefs
         # https://data.unep-wcmc.org/datasets/1
         # We are modifying the code from the Restrepo et al paper that I wrote
+
         self._add_reefs_big_map()
-        # self.zoom_map_ax.set_extent(extents=(38.75, 39.25, 22, 22.5))
-        # land_10m, ocean_10m = self._get_naural_earth_features_zoom_map()
-        # self._draw_natural_earth_features_zoom_map(land_10m, ocean_10m)
-        # self._put_gridlines_on_zoom_map_ax()
-        # self._annotate_zoom_map()
 
         small_map_ax, small_x0, small_x1, small_y0, small_y1 = self._position_and_draw_inset_axis()
 
@@ -828,14 +833,20 @@ class MapWthInsetFigure:
 
         self._draw_gridlines_on_inset(small_map_ax)
 
-        poly_xs = self._add_legend_bbox()
+        self._add_legend_bbox()
 
         self._populate_map_legend()
 
         print('saving .png')
-        plt.savefig(os.path.join(self.fig_out_path, 'eighty_four_map_w_reef_big.png'), dpi=600)
+        if self.full:
+            plt.savefig(os.path.join(self.fig_out_path, 'eighty_four_map_w_reef_big_full_rs.png'), dpi=600)
+        else:
+            plt.savefig(os.path.join(self.fig_out_path, 'eighty_four_map_w_reef_big.png'), dpi=600)
         print('saving .svg')
-        plt.savefig(os.path.join(self.fig_out_path, 'eighty_four_map_w_reef_big.svg'))
+        if self.full:
+            plt.savefig(os.path.join(self.fig_out_path, 'eighty_four_map_w_reef_big_full_rs.svg'))
+        else:
+            plt.savefig(os.path.join(self.fig_out_path, 'eighty_four_map_w_reef_big.svg'))
 
     def _add_reefs_big_map(self):
         from cartopy.io.shapereader import Reader
@@ -896,9 +907,12 @@ class MapWthInsetFigure:
         generate a Gridliner object (normally returned by GeoAxis.gridlines() ourselves. We then need
         to manually change the xlabels_bottom and ylabels_right attributes of this Gridliner object.
         We then draw it by adding it to the GeoAxis._gridliners list."""
-
-        xlocs = [32.0, 34.0, 36.0, 38.0, 40.0, 42.0]
-        ylocs = [21.0, 23.0, 25.0, 27.0, 29.0, 31.0]
+        if self.full:
+            xlocs = [34.0, 38.0, 42.0]
+            ylocs = [13.0, 17.0, 21.0, 25.0, 29.0]
+        else:
+            xlocs = [32.0, 34.0, 36.0, 38.0, 40.0, 42.0]
+            ylocs = [21.0, 23.0, 25.0, 27.0, 29.0, 31.0]
 
         if xlocs is not None and not isinstance(xlocs, mticker.Locator):
             xlocs = mticker.FixedLocator(xlocs)
@@ -907,7 +921,7 @@ class MapWthInsetFigure:
         g1 = Gridliner(
             axes=self.large_map_ax, crs=ccrs.PlateCarree(), draw_labels=True,
             xlocator=xlocs, ylocator=ylocs)
-        g1.xlabels_bottom = False
+        g1.xlabels_top = False
         g1.ylabels_right = False
         self.large_map_ax._gridliners.append(g1)
         # self.large_map_ax.gridlines(draw_labels=True)
@@ -938,8 +952,7 @@ class MapWthInsetFigure:
         for site in ['ICN']:
             if site != 'PrT':
                 self.large_map_ax.plot(self.sites_location_dict[site][0], self.sites_location_dict[site][1],
-                                       self.site_marker_dict[site], markerfacecolor=self.site_color_dict[site], markeredgecolor='none',
-                                       markersize=8)
+                                       self.site_marker_dict[site], markerfacecolor=self.site_color_dict[site], markeredgecolor='black', markersize=6, markeredgewidth=0.2)
             else:
                 self.large_map_ax.plot(self.sites_location_dict[site][0], self.sites_location_dict[site][1],
                                        self.site_marker_dict[site], markerfacecolor='black', markeredgecolor='black',
@@ -955,28 +968,29 @@ class MapWthInsetFigure:
         self.zoom_map_ax.plot(x_site_coords[2], y_site_coords[2], 'ko')
 
     def _populate_map_legend(self):
-        leg_xs = [33.6]
-        leg_ys = [22 + 8 / 5, 22 + 6 / 5, 22 + 4 / 5, 22 + 2 / 5]
+        leg_width = (self.leg_poly_xs[1] - self.leg_poly_xs[0])
+        leg_xs = [self.leg_poly_xs[0] + (leg_width/4)]
+        leg_height = self.leg_poly_ys[2] - self.leg_poly_ys[0]
+        # leg_xs = [33.6]
+        leg_ys = [self.leg_poly_ys[0] + ((_*leg_height)/5) for _ in [4,3,2,1]]
+        # leg_ys = [22 + 8 / 5, 22 + 6 / 5, 22 + 4 / 5, 22 + 2 / 5]
         for i, site in enumerate(['ICN', 'AF', 'ExT', 'PrT']):
             if site != 'ICN':
                 self.large_map_ax.plot(leg_xs[0], leg_ys[i], self.site_marker_dict[site], markerfacecolor=self.site_color_dict[site],
-                                       markeredgecolor='none', markersize=6, zorder=4)
+                                       markeredgecolor='black', markersize=6, zorder=4, markeredgewidth=0.2)
             else:
                 self.large_map_ax.plot(leg_xs[0], leg_ys[i],
-                                       self.site_marker_dict[site], markerfacecolor=self.site_color_dict[site], markeredgecolor='none',
-                                       markersize=6, zorder=4)
-            self.large_map_ax.text(leg_xs[0] + 0.75, leg_ys[i], s=site, verticalalignment='center',
+                                       self.site_marker_dict[site], markerfacecolor=self.site_color_dict[site], markeredgecolor='black',
+                                       markersize=6, zorder=4, markeredgewidth=0.2)
+            self.large_map_ax.text(self.leg_poly_xs[0] + leg_width*2/4, leg_ys[i], s=site, verticalalignment='center',
                                    horizontalalignment='left', fontsize='x-small')
 
     def _add_legend_bbox(self):
-        poly_xs = [33, 36, 36, 33]
-        poly_ys = [22, 22, 24, 24]
         leg_poly = Polygon(
-            xy=[[x, y] for x, y in zip(poly_xs, poly_ys)],
+            xy=[[x, y] for x, y in zip(self.leg_poly_xs, self.leg_poly_ys)],
             closed=True, edgecolor='black', fill=True,
-            facecolor='white', alpha=0.8, zorder=3)
+            facecolor='white', alpha=1, zorder=3)
         self.large_map_ax.add_patch(leg_poly)
-        return poly_xs
 
     def _draw_arrows_on_inset(self, annotation_xs, annotation_y, small_map_ax):
         self._annotate_site_arrow_small_map(
@@ -1002,8 +1016,8 @@ class MapWthInsetFigure:
         g1 = Gridliner(
             axes=small_map_ax, crs=ccrs.PlateCarree(), draw_labels=True,
             xlocator=xlocs, ylocator=ylocs)
-        g1.xlabels_top = False
-        g1.ylabels_right = False
+        g1.xlabels_bottom = False
+        g1.ylabels_left = False
         small_map_ax._gridliners.append(g1)
 
     def _draw_site_markers_on_inset(self, small_map_ax, small_x0, small_x1):
@@ -1025,14 +1039,14 @@ class MapWthInsetFigure:
         # plot the 'kaust point'
         small_map_ax.plot(
             annotation_xs[0], annotation_y, self.site_marker_dict['AF'],
-            markerfacecolor=self.site_color_dict['AF'], markeredgecolor='none', markersize=8)
+            markerfacecolor=self.site_color_dict['AF'], markeredgecolor='black', markersize=6, markeredgewidth=0.2)
         # plot exposed
         small_map_ax.plot(
             annotation_xs[1], annotation_y, self.site_marker_dict['ExT'],
-            markerfacecolor=self.site_color_dict['ExT'], markeredgecolor='none', markersize=8)
+            markerfacecolor=self.site_color_dict['ExT'], markeredgecolor='black', markersize=6, markeredgewidth=0.2)
         small_map_ax.plot(
             annotation_xs[2], annotation_y, self.site_marker_dict['PrT'],
-            markerfacecolor=self.site_color_dict['PrT'], markeredgecolor='none', markersize=8)
+            markerfacecolor=self.site_color_dict['PrT'], markeredgecolor='black', markersize=6, markeredgewidth=0.2)
         return annotation_xs, annotation_y
 
     def _reposition_inset(self, small_map_ax):
@@ -1047,8 +1061,12 @@ class MapWthInsetFigure:
 
     def _draw_zoom_shade(self, small_x0, small_x1, small_y1):
         # draw the lines that connect the inset to the bouding box
-        poly_x = [small_x0, small_x1, 41, 37]
-        poly_y = [small_y1, small_y1, 26, 26]
+        if self.full:
+            poly_x = [small_x0, small_x1, 45, 38]
+            poly_y = [small_y1, small_y1, 23, 23]
+        else:
+            poly_x = [small_x0, small_x1, 41, 37]
+            poly_y = [small_y1, small_y1, 26, 26]
         poly_xy = [[x, y] for x, y in zip(poly_x, poly_y)]
         zoom_poly = Polygon(poly_xy, closed=True, fill=True, color='black', alpha=0.1, linewidth=1, zorder=4)
         self.large_map_ax.add_patch(zoom_poly)
@@ -1100,7 +1118,10 @@ class MapWthInsetFigure:
 
     def _position_and_draw_inset_axis(self):
         # making a smal axis
-        display_coordinates = self.large_map_ax.transData.transform([(37.0, 26.0), (41.0, 30.0)])
+        if self.full:
+            display_coordinates = self.large_map_ax.transData.transform([(39.0, 23.0), (45.0, 30.0)])
+        else:
+            display_coordinates = self.large_map_ax.transData.transform([(37.0, 26.0), (41.0, 30.0)])
         inv = self.fig.transFigure.inverted()
         fig_data = inv.transform(display_coordinates)
         width = fig_data[1][0] - fig_data[0][0]
@@ -1118,7 +1139,7 @@ class MapWthInsetFigure:
         # draw arrows on plot
         dx = head_x - tail_x
         dy = head_y - tail_y
-        small_map_ax.arrow(x=tail_x, y=tail_y, dx=dx, dy=dy, zorder=zorder, linewidth=linewidth)
+        small_map_ax.arrow(x=tail_x, y=tail_y, dx=dx, dy=dy, zorder=zorder, linewidth=linewidth, ec='black', fc='black')
 
     def _add_kml_file_to_ax(self, ax, kml_path, linewidth=0.8, linestyle='-', color='black', ):
         with open(kml_path, 'r') as f:
@@ -1177,7 +1198,8 @@ class TranscriptomicsFigure:
             tot += abs(val)
         return tot
 
-mwif = MapWthInsetFigure()
+# If full then the whole Red Sea length will be plotted
+mwif = MapWthInsetFigure(full=False)
 mwif.draw_map()
 # sof = SampleOrdinationFigure()
 # sof.plot_ordination_figure()
