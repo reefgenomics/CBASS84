@@ -1,4 +1,4 @@
-#CBASS84_16S
+# CBASS84_16S
 
 This directory contains the scripts used to analyze and create figures for the 16S dataset.
 
