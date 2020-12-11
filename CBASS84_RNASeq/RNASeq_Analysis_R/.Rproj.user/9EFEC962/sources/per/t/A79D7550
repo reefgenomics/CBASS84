@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1604080253435.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1015920242",
+    "id" : "A79D7550",
+    "lastKnownWriteTime" : 1604687602,
+    "last_content_update" : 1604687603060,
+    "path" : "/mnt/omics4tb2-serdar/Collaborations/Vulcan/RNASeq_Analysis/code/test_reverse.R",
+    "project_path" : "code/test_reverse.R",
+    "properties" : {
+        "cursorPosition" : "123,0",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

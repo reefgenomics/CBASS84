@@ -1,0 +1,87 @@
+---
+title: "Home"
+site: workflowr::wflow_site
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library('tximport')
+library('rhdf5')
+library("DESeq2")
+library('DT')
+library('tictoc')
+library('apeglm')
+library('viridis')
+library('tidyverse')
+library('Cairo')
+library('sleuth')
+source('code/import_kallisto2DESeq.R')
+source('code/create_conditions.R')
+source('code/deg_analysis.R')
+source('code/volcano_plot.R')
+source('code/create_DEG_matrix.R')
+source('code/plot_pca.R')
+source('code/plot_topn_heatmap.R')
+Sys.setenv("DISPLAY"=":0.0")
+
+```
+# Coral RNA SEQ Analysis
+<p>
+Corals from the northern Red Sea, in particular the Gulf of Aqaba (GoA), have exceptionally high bleaching thresholds approaching >5°C above their maximum monthly mean (MMM) temperatures. These elevated thresholds are thought to be due to historical selection, as corals passed through the warmer Southern Red Sea during re-colonization from the Arabian Sea. To test this hypothesis, we determined thermal tolerance thresholds of GoA versus Central Red Sea (CRS) Stylophora pistillata corals using a series of standardized acute thermal stress assays. Relative thermal thresholds of GoA and CRS corals were indeed similar and exceptionally high (~7°C above MMM), although absolute thermal thresholds of CRS corals were on average 3°C above those of GoA corals. To explore the mechanistic underpinnings, we determined gene expression response and community composition of coral holobiont compartments. </p>
+
+## Load kallisto counts
+<p>Get list of abundance files from kallisto results and load into DESEq</p>
+```{r echo=TRUE, message=FALSE, warning=TRUE,results='hide'}
+if(fs::is_file("data/deseq_data.RDS")){
+   cat("\t DESEq2 result data exists, loading.. \n")
+   deseq_data <- readRDS('data/deseq_data.RDS')
+ }else{
+   cat("\t DESEq2 result data does not exist, starting analysis.. \n")
+   deseq_data <- import_kallisto2DESeq()
+   saveRDS(deseq_data, file = "data/deseq_data.RDS")
+ }
+datatable(deseq_data$meta_data, caption = "Meta-data information")
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=TRUE}
+## Count summary for Spis
+# rr <- colSums(counts(deseq_data$dds.Spis)) / 1e6
+# rrdf <- data.frame(Reads = rr, Sample = names(rr), stringsAsFactors = FALSE)
+# selGroups <- as.data.frame(colData(deseq_data$dds.Spis)[c("Reef.Site.Name")])
+# rrdf$Group <- interaction(selGroups)
+# rrdf$Temp <- interaction(as.data.frame(colData(deseq_data$dds.Spis)[c("Temp")]))
+# 
+# p <- ggplot(rrdf, aes(Sample, Reads, group=Group, fill=Group))
+# p <- p + geom_bar(stat="identity")
+# p <- p + facet_grid(cols = vars(Temp))
+# p <- p + labs(x="Samples", y="Reads (million)")
+# p
+```
+
+```{r echo=FALSE, message=FALSE, warning=TRUE}
+## Count summary for Smic
+# rr <- colSums(counts(deseq_data$dds.Smic)) / 1e6
+# rrdf <- data.frame(Reads = rr, Sample = names(rr), stringsAsFactors = FALSE)
+# selGroups <- as.data.frame(colData(deseq_data$dds.Smic)[c("Reef.Site.Name")])
+# rrdf$Group <- interaction(selGroups)
+# rrdf$Temp <- interaction(as.data.frame(colData(deseq_data$dds.Smic)[c("Temp")]))
+# 
+# p <- ggplot(rrdf, aes(Sample, Reads, group=Group, fill=Group))
+# p <- p + geom_bar(stat="identity")
+# p <- p + facet_grid(cols = vars(Temp))
+# p <- p + labs(x="Samples", y="Reads (million)")
+# p
+```
+
+
+## Create comparison conditions
+Create conditions for differential expression analysis {.tabset}
+```{r echo=TRUE, message=FALSE, warning=FALSE,results='hide'}
+conditions <- create_conditions(meta_data= deseq_data$meta_data)
+```
+

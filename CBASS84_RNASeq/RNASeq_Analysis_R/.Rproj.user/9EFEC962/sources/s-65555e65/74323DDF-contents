@@ -1,0 +1,134 @@
+---
+title: "Spis DEG Analysis"
+author: "Serdar Turkarslan"
+date: "10/28/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library('tximport')
+library('rhdf5')
+library("DESeq2")
+library('DT')
+library('tictoc')
+library('apeglm')
+library('viridis')
+library('tidyverse')
+library('Cairo')
+library('sleuth')
+source('code/import_kallisto2DESeq.R')
+#source('code/create_conditions.R')
+source('code/deg_analysis.R')
+source('code/volcano_plot.R')
+source('code/create_DEG_matrix.R')
+source('code/plot_pca.R')
+source('code/plot_topn_heatmap.R')
+Sys.setenv("DISPLAY"=":0.0")
+
+```
+
+```{r echo=FALSE, message=FALSE, warning=TRUE,results='hide'}
+if(fs::is_file("data/deseq_data.RDS")){
+   cat("\t DESEq2 result data exists, loading.. \n")
+   deseq_data <- readRDS('data/deseq_data.RDS')
+ }else{
+   cat("\t DESEq2 result data does not exist, starting analysis.. \n")
+   deseq_data <- import_kallisto2DESeq()
+   saveRDS(deseq_data, file = "data/deseq_data.RDS")
+ }
+datatable(deseq_data$meta_data, caption = "Meta-data information")
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,results='hide'}
+#conditions <- create_conditions(meta_data= deseq_data$meta_data)
+conds1 <- read_csv(file="data/DESeq_Re-run_Conditions_CRVOct27.csv", col_names = T) %>%
+   mutate(Conditions = str_replace(Conditions, ".txt", ""))
+conditions <- conds1$Conditions
+```
+
+# DEG analysis for Spis {.tabset}
+```{r echo=TRUE, message=FALSE,warning=FALSE,results='hide'}
+cat("Started DEG analysis...\n")
+org = "Spis"
+for(condition in conditions){
+   deg.file <- paste("output/", org, "/DEG_tables_svalues/",condition,".txt", sep="")
+   if(fs::is_file(deg.file)){
+      cat("\t DEG analysis for ", condition, "exists, skipping \n")
+   }else{
+      cat("\t DEG analysis for ", condition, "does NOT exists, continuing \n")
+      deg_analysis(condition=condition, dds=deseq_data$dds.Spis, lfc=2, write2file=T, org = org)
+   }
+}
+```
+<p>DEG Results for all conditions are [here](`r paste("output/", org, "/DEG_tables_svalues/", sep="")`)</p>
+
+
+## Volcano plots
+```{r echo=TRUE,message=FALSE,warning=FALSE,results='hide'}
+cat("Plotting volcano plots.\n")
+org = "Spis"
+rerun = FALSE
+for(condition in conditions){
+   pdf.file <- paste("output/",org,"/volcano_plots_svalues/",condition,"_volcano.pdf", sep="")
+   if(fs::is_file(pdf.file) & rerun==FALSE){
+      cat("\t Volcano plot for ", condition, "exists, skipping \n")
+   }else{
+      cat("\t Volcano plot for ", condition, "does NOT exists, continuing \n")
+      pdf(file=pdf.file)
+      volcano_plot(condition = condition, org="Spis", lfc=2, svalue=0.005)
+      dev.off()
+   }
+}
+```
+<p>Volcano plots for all conditions are [here](`r paste("output/", org, "/volcano_plots_svalues/", sep="")`)</p>
+
+
+## DEG Matrix
+```{r echo=TRUE,dev=c('png'),results='hide'}
+##### 4. create DEG matrix and write results into a file #####
+org="Spis"
+DEG.matrix <- create_DEG_matrix(org = org)
+write.table(DEG.matrix$matrix, file=paste("output/",org,"/DEG_matrix.txt", sep=""), sep="\t")
+write.table(DEG.matrix$updown, file=paste("output/",org,"/DEG_matrix_up_down.txt", sep=""), sep="\t")
+pheatmap(mat=DEG.matrix$matrix,
+         cluster_rows = F, 
+         cluster_cols = F, 
+         display_numbers = T,
+         number_format = "%.0f", 
+         main = paste(org, " DEG Matrix", sep = "")
+         )
+dev.print(pdf, paste("output/",org,"/DEG_matrix_heatmap.pdf", sep=""))
+```
+
+## Heatmap of top 50 DEGs
+```{r echo=TRUE,dev=c('png')}
+org="Spis"
+results_dir= paste("output/", org,"/summary_plots/", sep = "")
+plot_topn_heatmap(org = "Spis",n = 50,dds=deseq_data$dds.Spis)
+dev.print(pdf, paste(results_dir,"top50_DEG_heatmap.pdf",sep = ""))
+```
+
+## PCA for all samples
+```{r echo=TRUE,dev=c('png')}
+org="Spis"
+results_dir= paste("output/", org,"/summary_plots/", sep = "")
+plot_pca(org = "Spis",vsd = deseq_data$vsd.Spis)
+dev.print(pdf, paste(results_dir,"PCA_plot.pdf",sep = ""))
+```
+
+## TPM MAtrix 
+```{r echo=TRUE}
+org="Spis"
+meta_data <- deseq_data$meta_data
+my.dir <- "/mnt/omics4tb2-serdar/Collaborations/Vulcan/data/181203_K00235_0152_BHWNJ7BBXX_CBASS84_RNASeq"
+sample_id <- dir(file.path(my.dir))
+sample_id <- sample_id[!(sample_id %in% c("Lanes_metadata", "ES1-36A","S6-P-ST-36B","KS2-33A","ES3-33A","all_htseqcounts", "label_changes_README.txt"))]
+files <- file.path(my.dir, sample_id, "results0920_kallisto_Spis_Smic", "abundance.h5")
+meta_data <- dplyr::mutate(meta_data, path = files)
+
+so.spis <- sleuth_prep(meta_data, num_cores = 8)
+sleuth_matrix_spis <- sleuth_to_matrix(so.spis, 'obs_norm', 'tpm')
+spis_TPM_matrix <- sleuth_matrix_spis[grep("Spis", row.names(sleuth_matrix_spis)),]
+write.table(spis_TPM_matrix, file=paste("output/", org, "/spis_kallisto_TPM_norm_matrix.txt", sep = ""), sep = "\t")
+
+```

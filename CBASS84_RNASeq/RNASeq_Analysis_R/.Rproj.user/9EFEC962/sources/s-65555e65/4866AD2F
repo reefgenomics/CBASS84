@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1603925808262.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "4866AD2F",
+    "lastKnownWriteTime" : 1603925859,
+    "last_content_update" : 1603925859226,
+    "path" : "/mnt/omics4tb2-serdar/Collaborations/Vulcan/RNASeq_Analysis/analysis/Smic_DEG_analysis.Rmd",
+    "project_path" : "analysis/Smic_DEG_analysis.Rmd",
+    "properties" : {
+        "cursorPosition" : "46,31",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1604079997321.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3581805668",
+    "id" : "F7FAB7BF",
+    "lastKnownWriteTime" : 1603996138,
+    "last_content_update" : 1603996138,
+    "path" : "/mnt/omics4tb2-serdar/Collaborations/Vulcan/RNASeq_Analysis/analysis/Spis_DEG_analysis.Rmd",
+    "project_path" : "analysis/Spis_DEG_analysis.Rmd",
+    "properties" : {
+        "cursorPosition" : "129,0",
+        "scrollLine" : "116"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

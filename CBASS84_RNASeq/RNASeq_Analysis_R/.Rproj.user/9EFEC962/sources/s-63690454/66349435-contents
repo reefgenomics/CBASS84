@@ -1,0 +1,52 @@
+lfc = 2
+condition = "condition_36_ICN_vs_30_ICN"
+condition2 = "condition_30_ICN_vs_36_ICN"
+
+cond0 <- strsplit(paste(condition, sep=""), split = "condition_")[[1]][2]
+cond1 <- strsplit(cond0, split = "_vs_")[[1]][1]
+cond2 <- strsplit(cond0, split = "_vs_")[[1]][2]
+cat("\t\t Cond1:", cond1, " Cond2:", cond2, "\n")
+
+deseq_data <- readRDS("./data/deseq_data.RDS")
+
+
+### Condition 1
+condition = "condition_36_ICN_vs_30_ICN"
+dds1 <- deseq_data$dds.Spis
+
+# relevel to set cond2 as our reference sample
+dds1$condition <- relevel(dds1$condition, ref = "30_ICN")
+
+# Run DEseq2
+dds1 <- DESeq(dds1)
+
+# get results and use lfc shrinkage for visualization
+resLFC1 <- lfcShrink(dds = dds1,
+                    coef = condition,
+                    type="apeglm",
+                    lfcThreshold = lfc)
+# Order results
+res1.ordered <- resLFC1[order(resLFC1$svalue),]
+
+res11 <- results(dds1)
+res22 <- results(dds)
+
+### Condition 2
+condition2 = "condition_30_ICN_vs_36_ICN"
+dds <- deseq_data$dds.Spis
+
+# relevel to set cond2 as our reference sample
+dds$condition <- relevel(dds$condition, ref = "36_ICN")
+
+# Run DEseq2
+dds <- DESeq(dds)
+
+# get results and use lfc shrinkage for visualization
+resLFC2 <- lfcShrink(dds = dds,
+                     coef = condition2,
+                     type="apeglm",
+                     lfcThreshold = lfc)
+# Order results
+res2.ordered <- resLFC2[order(resLFC2$svalue),]
+
+

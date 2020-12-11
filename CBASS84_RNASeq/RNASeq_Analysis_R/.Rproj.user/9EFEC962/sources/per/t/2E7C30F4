@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1604079989101.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3011172986",
+    "id" : "2E7C30F4",
+    "lastKnownWriteTime" : 1600292788,
+    "last_content_update" : 1600292788,
+    "path" : "/mnt/omics4tb2-serdar/Collaborations/Vulcan/RNASeq_Analysis/code/deg_analysis.R",
+    "project_path" : "code/deg_analysis.R",
+    "properties" : {
+        "cursorPosition" : "32,46",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
