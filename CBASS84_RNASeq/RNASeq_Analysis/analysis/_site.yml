@@ -1,0 +1,20 @@
+name: "RNASeq_Analysis"
+output_dir: ../docs
+navbar:
+  title: "Coral_RNASeq_Analysis"
+  left:
+  - text: Home
+    href: index.html
+  - text: Spis DEG Analysis
+    href: Spis_DEG_analysis.html
+  - text: Smic DEG Analysis
+    href: Smic_DEG_analysis.html  
+  - text: About
+    href: about.html
+  
+output:
+  workflowr::wflow_html:
+    toc: yes
+    toc_float: yes
+    theme: sandstone
+    highlight: textmate

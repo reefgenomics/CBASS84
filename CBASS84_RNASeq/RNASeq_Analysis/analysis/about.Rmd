@@ -1,0 +1,12 @@
+---
+title: "About"
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+<p>
+Corals from the northern Red Sea, in particular the Gulf of Aqaba (GoA), have exceptionally high bleaching thresholds approaching >5°C above their maximum monthly mean (MMM) temperatures. These elevated thresholds are thought to be due to historical selection, as corals passed through the warmer Southern Red Sea during re-colonization from the Arabian Sea. To test this hypothesis, we determined thermal tolerance thresholds of GoA versus Central Red Sea (CRS) Stylophora pistillata corals using a series of standardized acute thermal stress assays. Relative thermal thresholds of GoA and CRS corals were indeed similar and exceptionally high (~7°C above MMM), although absolute thermal thresholds of CRS corals were on average 3°C above those of GoA corals. To explore the mechanistic underpinnings, we determined gene expression response and community composition of coral holobiont compartments.
+
+</p>
