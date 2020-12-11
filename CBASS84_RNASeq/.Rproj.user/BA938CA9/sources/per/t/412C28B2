@@ -1,0 +1,24 @@
+{
+    "id": "412C28B2",
+    "path": "~/Documents/GitHub/CBASS84/CBASS84_RNASeq/RNASeq_Analysis/code/import_kallisto2DESeq.R",
+    "project_path": "RNASeq_Analysis/code/import_kallisto2DESeq.R",
+    "type": "r_source",
+    "hash": "1150957808",
+    "contents": "",
+    "dirty": false,
+    "created": 1600202823778.0,
+    "source_on_save": false,
+    "relative_order": 11,
+    "properties": {
+        "cursorPosition": "56,52",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1600205116,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1600205116256,
+    "read_only": false,
+    "read_only_alternatives": []
+}

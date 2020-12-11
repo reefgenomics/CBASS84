@@ -1,0 +1,378 @@
+---
+title: "Network analysis of Osteoblast Modulated BTZ Resistance"
+author: "Serdar Turkarslan, Adrian Lopez Garcia de Lomana, Carl Murie and Nitin Baliga"
+date: "8/13/2020"
+output: html_document
+---
+
+```{r, echo=FALSE, warning=FALSE,message=FALSE,results=FALSE}
+library('tidyverse')
+library('reshape2')
+library('pheatmap')
+library('jsonlite')
+library('biomaRt')
+library("AnnotationDbi")
+library("org.Hs.eg.db")
+library('tidyjson')
+library("stringi")
+library("readxl")
+library("DT")
+library('pathfindR')
+#setwd("~/Documents/GitHub/CDI/CDI_Project/analysis/")
+```
+
+### Molecular mechanisms of bortezomib resistance in multiple myeloma cells in the presence of osteoblasts
+<p>We sought to better understand the molecular mechanisms behind BTZ resistance in MM cells in the context of osteoblasts. Here, we exposed MM.1S cells to 10 nM of bortezomib (BTZ) for 24 hours both in monoculture and co-cultured with osteoblasts (OBs). We collected MM.1S cells at times zero, one, four, and 24 hours (time points T0, T1, T4, and T24, respectively) after BTZ treatment and quantified their transcriptome via RNA-sequencing. We aimed to understand the regulatory mechanisms behind BTZ resistance in the presence of OBs. 
+</p>
+<p>
+<b>BTZ Transcriptional response in the context of OBs</b>
+After read quality filtering and transcriptome quantification using Trimmomatic [4] and kallisto [5] respectively, we performed sample quality control on resulting gene abundances to confirm that growing conditions (monoculture vs co-culture) and BTZ treatment reflect the major sources of variation in the data while maintaining good replicate consistency. 
+<br>
+
+After applying these filters, we found that osteoblast co-cultured MM.1S cells presented a set of 133 DEGs with respect to mono-culture before BTZ exposure, i.e., at time T0—precisely, 107 upregulated DEGs and 26 downregulated DEGs. Comparing T24 against T0 in co-culture resulted in 421 upregulated and 225 downregulated genes. In the cases of monoculture between T24 against their T0 resulted in 271 upregulated and 1,066 downregulated genes. All DEGs across all conditions can be found in Table 2 and their functional enrichment.
+
+## Explore Results {.tabset .tabset-pills}
+
+### Differential Expression Analysis
+<p>
+We proceed to characterize the differential transcriptional response in MM.1S cells with respect to BTZ treatment and co-culturing with osteoblasts. We used DESeq2 [6] to determine statistically significant differentially expressed genes (DEGs) across experimental conditions and furthermore, we filtered out DEGs that (i) were lowly expressed, (ii) showed relatively small fold-change (FC) differences, and (iii) had highly variable expression across biological replicates; see Methods for details. 
+</p>
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# Read TPM matrix
+tpm.table <- readxl::read_xlsx("data/TPMs_table_1.xlsx")
+
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+### Read DEG excel file and concatenate all the shhets into a single data frame
+path <- "data/DEGs_table_2.xlsx"
+deg_conc <- path %>%
+  excel_sheets() %>%
+  set_names() %>%
+  map_df(~ read_xlsx(path = path, sheet = .x), .id = "Condition")
+```
+
+
+```{r, echo=FALSE}
+### DEG Table
+datatable(deg_conc, caption = "Table of differentiall expressed genes for all conditions")
+
+```
+
+### Pathway Enrichment of DEGs
+<p> DEGs for each comparison were used to determine if specific pathways were up or down regulated in the presence of osteoblasts. Pathway enrichment was performed by using [pathfindR](https://egeulgen.github.io/pathfindR/) R package to perform pathway enrichment analysis via active subnetworks. Enriched terms are also clustered and representative terms in each cluster are identified.
+</p>
+Results for specific condition comparisons can be explored by following the corresponding links.
+
+#### All Results
+
+#### [hFOB.MM1S_0hr vs MM1S_0hr](pathfindR/report_co_T0_vs_mono_T0.html)
+
+#### [hFOB.MM1S_24hr vs hFOB.MM1S_0hr](pathfindR/report_co_T24_vs_co_T0.html)
+
+#### [ MM1S_24hr vs MM1S_0hr](pathfindR/report_mono_T24_vs_mono_T0.html)
+</p>
+<p>
+##### Term Visualizations {.tabset .tabset-pills}
+<p>For each enriched pathway/term Interactions of affected genes are determined (via a shortest-path algorithm) and are visualized (colored by change status) using igraph.
+</p>
+
+###### co_T0_vs_mono_T0
+```{r, results = 'asis'}
+
+plots <- list.files("pathfindR/co_T0_vs_mono_T0/term_visualizations/")
+for(i in plots){
+  filename <- file.path("pathfindR/co_T0_vs_mono_T0/term_visualizations/", i)
+  cat("![text](",filename,")")
+}
+```
+<p>
+###### co_T24_vs_co_T0
+```{r, results = 'asis'}
+
+plots <- list.files("pathfindR/co_T24_vs_co_T0/term_visualizations/")
+for(i in plots){
+  filename <- file.path("pathfindR/co_T24_vs_co_T0/term_visualizations/", i)
+  cat("![text](",filename,")")
+}
+```
+<p>
+###### mono_T24_vs_mono_T0
+```{r, results = 'asis'}
+
+plots <- list.files("pathfindR/mono_T24_vs_mono_T0/term_visualizations/")
+for(i in plots){
+  filename <- file.path("pathfindR/mono_T24_vs_mono_T0/term_visualizations/", i)
+  cat("![text](",filename,")")
+}
+```
+<p>
+##### {-}
+<p>
+### Network Activity  Analysis {.tabset .tabset-pills}
+<p><b> Model Details: </b> Network activity was calculated based on the Multiple Myeloma Transcriptional Regulatory Network (TRN) that was built by the application of [MINER algorithm](https://www.biorxiv.org/content/10.1101/2020.04.01.012351v1.full) to the pre-processed MMRF IA12 data. The network features 15,192 genes partitioned into 1,233 co-expression clusters (i.e., without inferred co-regulation), 8,549 genes partitioned into 3,203 co-regulated modules (called <b>regulons</b>) that are regulated by 392 unique transcription factors, and 124 causal drivers, including somatic mutations, translocations, and cytogenetic abnormalities.
+</p>
+<p><b> Network Activity: </b> We developed a new approach to quantifying the activity of the entire TRN within each patient sample by treating the regulons as discrete units within the network (i.e., quantization) and calculating their individual activation status. For each regulon, we classified its status as over-expressed, under-expressed, or neither using a p-value cutoff of 0.05 for each patient sample. Briefly, for a given regulon and patient sample, the number of genes in that regulon that appear in the top third of most highly expressed genes in that patient sample is compared to the number of genes expected to fall in the top third by random chance and a p- value is calculated. If the p-value is less than a threshold (e.g., 0.05), then the regulon is called over-expressed for that patient sample. Likewise, the number of regulon genes in the bottom third is used to determine if the regulon is under-active.
+</p>
+<p><b> Genetic Programs: </b> Clusters of regulons, called genetic programs (or simply programs) herein, were observed to have similar activity across patient samples (Fig. 2A). This was often, but not exclusively, observed when multiple regulons had significant overlap of the genes that they contained. We note that different regulons can exhibit high degrees of gene overlap but have different associated regulators. Genetic programs are, therefore, a convenient way to uncover putative combinatorial regulation.
+</p>
+<p>
+* ##### [MM1S_0hr](active_networks/active_network_enrichments/report_MM1S_0hr.html)
+* ##### [MM1S_1hr](active_networks/active_network_enrichments/report_MM1S_1hr.html)
+* ##### [MM1S_4hr](active_networks/active_network_enrichments/report_MM1S_4hr.html)
+* ##### [MM1S_24hr](active_networks/active_network_enrichments/report_MM1S_24hr.html)
+* ##### [hFOB.MM1S_0hr](active_networks/active_network_enrichments/report_hFOB.MM1S_0hr.html)
+* ##### [hFOB.MM1S_1hr](active_networks/active_network_enrichments/report_hFOB.MM1S_1hr.html)
+* ##### [hFOB.MM1S_4hr](active_networks/active_network_enrichments/report_hFOB.MM1S_4hr.html)
+* ##### [hFOB.MM1S_24hr](active_networks/active_network_enrichments/report_hFOB.MM1S_24hr.html)
+</p>
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE} 
+#setwd("~/Documents/GitHub/CDI/active_networks")
+genes_by_term <- pathfindR.data::reactome_genes
+    term_descriptions <- pathfindR.data::reactome_descriptions
+    background_genes <- unlist(pathfindR.data::reactome_genes)
+
+zscores <- read.csv("data/gsva_zscore.csv")
+zscores.melted <- melt(zscores, measure.vars = c(colnames(zscores)[-1]))
+
+zscore.filtered <- zscores.melted %>%
+  separate(col="variable", c("no","type","time","replicate"),remove=F, sep="_") %>%
+  mutate(sample = paste(type,time, sep="_"))
+
+active.networks <- zscore.filtered %>%
+  filter(value > 0.25)
+down.networks  <- zscore.filtered %>%
+  filter(value < -0.25)
+## only keep active regulons that are active in all replicates 
+samples.active <- data.frame()
+for(i in unique(active.networks$sample)){
+  sample1.active <- active.networks %>%
+    filter(sample == i) %>%
+    count(regulons,sample) %>%
+    filter(n ==3)
+    samples.active <- bind_rows(samples.active, sample1.active)
+}
+
+## only keep down regulons that are down in all replicates
+samples.down <- data.frame()
+for(i in unique(down.networks$sample)){
+  sample1.down <- down.networks %>%
+    filter(sample == i) %>%
+    count(regulons,sample) %>%
+    filter(n ==3)
+  samples.down <- bind_rows(samples.down , sample1.down)
+}
+
+## join with zscores active
+samples.active.joined <- inner_join(active.networks, samples.active, by=c("regulons","sample"))
+samples.active.collapsed <- samples.active.joined %>%
+  group_by(sample, regulons) %>%
+  summarise(mean_zscore = mean(value)) %>%
+  arrange(desc(mean_zscore))
+
+## join with zscores down
+samples.down.joined <- inner_join(down.networks, samples.down, by=c("regulons","sample"))
+samples.down.collapsed <- samples.down.joined %>%
+  group_by(sample, regulons) %>%
+  summarise(mean_zscore = mean(value)) %>%
+  arrange(mean_zscore)
+
+regulons <- read_csv('data/regulons_annotated.csv')
+
+programs <- fromJSON('data/transcriptional_programs.json')
+
+```
+
+
+
+
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+get_programs <- function(my.condition1, my.condition2, direction = c("active","inactive")){
+  if(direction == "active"){
+    regulon.input <- samples.active.collapsed
+  }
+  if(direction == "inactive"){
+    regulon.input <- samples.down.collapsed
+  }
+  
+  ### Programs for condition 1
+  condition1.regulons <- regulon.input %>%
+    filter(sample == my.condition1) %>%
+    pull(regulons)
+  
+  program.regulons.list1 <-
+    lapply(programs, function(i)
+      condition1.regulons[which(as.character(condition1.regulons) %in% i)])
+  
+  program.regulons.table1 <-
+    data.frame(program = seq_along(program.regulons.list1),
+               regulons = unlist(sapply(program.regulons.list1, paste, collapse = ",")))
+  
+  program.regulons.table1$regulon_counts = sapply(program.regulons.table1$regulons, function(j)
+    length(strsplit(as.character(j), split = ",")[[1]]))
+  program.regulons.table1$program <- names(program.regulons.list1)
+  
+  ### Programs for condition 2
+  condition2.regulons <- regulon.input %>%
+    filter(sample == my.condition2) %>%
+    pull(regulons)
+  
+  program.regulons.list2 <-
+    lapply(programs, function(i)
+      condition2.regulons[which(as.character(condition2.regulons) %in% i)])
+  
+  program.regulons.table2 <-
+    data.frame(program = seq_along(program.regulons.list2),
+               regulons = unlist(sapply(program.regulons.list2, paste, collapse = ",")))
+  
+  program.regulons.table2$regulon_counts = sapply(program.regulons.table2$regulons, function(j)
+    length(strsplit(as.character(j), split = ",")[[1]]))
+  program.regulons.table2$program <- names(program.regulons.list2)
+  
+  return(list(condition1.regulons = condition1.regulons, condition2.regulons = condition2.regulons, condicondition1.programs = program.regulons.table1, condition2.programs = program.regulons.table2))
+  
+}
+
+```
+
+#### Regulon Activity Comparions for "MM1S_0hr" and "hFOB.MM1S_0hr"
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+my.condition1 <- "MM1S_0hr"
+my.condition2 <- "hFOB.MM1S_0hr"
+a1 <- get_programs(my.condition1, my.condition2, direction = "active")
+b1 <- get_programs(my.condition1, my.condition2, direction = "inactive")
+
+cond1.active.regulons <- unique(a1$condition1.regulons)
+cond2.active.regulons <- unique(a1$condition2.regulons)
+
+cond1.inactive.regulons <- unique(b1$condition1.regulons)
+cond2.inactive.regulons <- unique(b1$condition2.regulons)
+
+
+both.active <- intersect(cond1.active.regulons, cond2.active.regulons)
+both.inactive <- intersect(cond1.inactive.regulons, cond2.inactive.regulons)
+
+only.cond1.active <- setdiff(cond1.active.regulons, cond2.active.regulons)
+only.cond2.active <- setdiff(cond2.active.regulons, cond2.active.regulons)
+
+active.cond1_inactive.cond2 <- intersect(cond1.active.regulons, cond2.inactive.regulons)
+inactive.cond1_active.cond2 <- intersect(cond1.inactive.regulons, cond2.active.regulons)
+
+cat("\n",my.condition1,":\n", 
+" Active: ", length(cond1.active.regulons),
+" InActive: ", length(cond1.inactive.regulons),
+" Only Active in ", my.condition1, ": ",length(only.cond1.active),"\n",
+"\n",my.condition2, ":\n",
+"Active: ", length(cond2.active.regulons),
+" InActive: ", length(cond2.inactive.regulons),
+" Only Active in ", my.condition2, ": ",length(only.cond2.active),"\n",
+" \nboth conditions: \n",
+" Active: ", length(both.active),
+" InActive: ", length(both.inactive),"\n",
+" Active in ", my.condition1, " Inactive in ", my.condition2, ":", length(active.cond1_inactive.cond2), "\n",
+" Inactive in ", my.condition1, " Active in ", my.condition2, ":", length(inactive.cond1_active.cond2), "\n") 
+```
+<p>
+##### Regulons: underactive in "MM1S_0hr" but active in "hFOB.MM1S_0hr"
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+### Program specific enrichments
+  ## Find programs that contain active regulons
+condition.regulons <- inactive.cond1_active.cond2  
+condition.regulon.genes <- regulons %>%
+    filter(Regulon_ID %in% condition.regulons) %>%
+    distinct(`Gene`) %>%
+    pull(`Gene`)
+
+  my.genes <- select(org.Hs.eg.db, keys= condition.regulon.genes, column="SYMBOL", keytype="ENSEMBL", multiVals="first")
+  
+  enrichment.table <- enrichment(
+    my.genes$SYMBOL,
+    genes_by_term = genes_by_term,
+    term_descriptions = term_descriptions,
+    adj_method = "bonferroni",
+    enrichment_threshold = 0.05,
+    sig_genes_vec = "",
+    background_genes = background_genes
+  )
+  enrichment.table <- enrichment.table %>%
+    dplyr::select(-non_Signif_Snw_Genes)
+
+  datatable(enrichment.table)
+```
+
+#### Regulon Activity Comparions for "MM1S_24hr" and "hFOB.MM1S_24hr"
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+my.condition1 <- "MM1S_24hr"
+my.condition2 <- "hFOB.MM1S_24hr"
+a1 <- get_programs(my.condition1, my.condition2, direction = "active")
+b1 <- get_programs(my.condition1, my.condition2, direction = "inactive")
+
+cond1.active.regulons <- unique(a1$condition1.regulons)
+cond2.active.regulons <- unique(a1$condition2.regulons)
+
+cond1.inactive.regulons <- unique(b1$condition1.regulons)
+cond2.inactive.regulons <- unique(b1$condition2.regulons)
+
+
+both.active <- intersect(cond1.active.regulons, cond2.active.regulons)
+both.inactive <- intersect(cond1.inactive.regulons, cond2.inactive.regulons)
+
+only.cond1.active <- setdiff(cond1.active.regulons, cond2.active.regulons)
+only.cond2.active <- setdiff(cond2.active.regulons, cond2.active.regulons)
+
+active.cond1_inactive.cond2 <- intersect(cond1.active.regulons, cond2.inactive.regulons)
+inactive.cond1_active.cond2 <- intersect(cond1.inactive.regulons, cond2.active.regulons)
+
+cat("\n",my.condition1,":\n", 
+" Active: ", length(cond1.active.regulons),
+" InActive: ", length(cond1.inactive.regulons),
+" Only Active in ", my.condition1, ": ",length(only.cond1.active),"\n",
+"\n",my.condition2, ":\n",
+"Active: ", length(cond2.active.regulons),
+" InActive: ", length(cond2.inactive.regulons),
+" Only Active in ", my.condition2, ": ",length(only.cond2.active),"\n",
+" \nboth conditions: \n",
+" Active: ", length(both.active),
+" InActive: ", length(both.inactive),"\n",
+" Active in ", my.condition1, " Inactive in ", my.condition2, ":", length(active.cond1_inactive.cond2), "\n",
+" Inactive in ", my.condition1, " Active in ", my.condition2, ":", length(inactive.cond1_active.cond2), "\n") 
+```
+
+##### Regulons: underactive in "MM1S_24hr" but active in "hFOB.MM1S_24hr"
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+### Program specific enrichments
+  ## Find programs that contain active regulons
+condition.regulons <- inactive.cond1_active.cond2  
+condition.regulon.genes <- regulons %>%
+    filter(Regulon_ID %in% condition.regulons) %>%
+    distinct(`Gene`) %>%
+    pull(`Gene`)
+
+  my.genes <- select(org.Hs.eg.db, keys= condition.regulon.genes, column="SYMBOL", keytype="ENSEMBL", multiVals="first")
+  
+  enrichment.table <- enrichment(
+    my.genes$SYMBOL,
+    genes_by_term = genes_by_term,
+    term_descriptions = term_descriptions,
+    adj_method = "bonferroni",
+    enrichment_threshold = 0.05,
+    sig_genes_vec = "",
+    background_genes = background_genes
+  )
+  enrichment.table <- enrichment.table %>%
+    dplyr::select(-non_Signif_Snw_Genes)
+
+  datatable(enrichment.table)
+```
+<p>
+### {-}
+
+## {-}
+
+
+

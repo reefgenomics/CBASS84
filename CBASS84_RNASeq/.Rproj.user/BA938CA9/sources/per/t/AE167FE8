@@ -1,0 +1,25 @@
+{
+    "id": "AE167FE8",
+    "path": "~/Documents/GitHub/CBASS84/CBASS84_RNASeq/RNASeq_Analysis/analysis/kallisto_tximport_DEseq2.Rmd",
+    "project_path": "RNASeq_Analysis/analysis/kallisto_tximport_DEseq2.Rmd",
+    "type": "r_markdown",
+    "hash": "2556487467",
+    "contents": "",
+    "dirty": false,
+    "created": 1600154666628.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "cursorPosition": "27,45",
+        "scrollLine": "21",
+        "last_setup_crc32": "93408E5D20122903"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1600282382,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1600282382876,
+    "read_only": false,
+    "read_only_alternatives": []
+}

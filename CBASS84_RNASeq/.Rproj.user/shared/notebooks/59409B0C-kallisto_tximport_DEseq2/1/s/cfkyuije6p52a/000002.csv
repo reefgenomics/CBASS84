@@ -1,0 +1,10 @@
+"0","if(fs::is_file(""deseq_data.RDS"")){"
+"0","   cat(""\t DESEq2 result data exists, loading.. \n"")"
+"0","   deseq_data <- readRDS('deseq_data.RDS')"
+"0"," }else{"
+"0","   cat(""\t DESEq2 result data does not exist, starting analysis.. \n"")"
+"0","   deseq_data <- import_kallisto2DESeq()"
+"0","   saveRDS(deseq_data, file = ""deseq_data.RDS"")"
+"0"," }"
+"1","	 DESEq2 result data exists, loading.. 
+"
