@@ -1,0 +1,24 @@
+{
+    "id": "314F8B5B",
+    "path": "~/Documents/GitHub/CBASS84/CBASS84_RNASeq/Spis_STAR_DESeq2_svalue_pipeline.R",
+    "project_path": "Spis_STAR_DESeq2_svalue_pipeline.R",
+    "type": "r_source",
+    "hash": "1565001595",
+    "contents": "",
+    "dirty": false,
+    "created": 1600204300343.0,
+    "source_on_save": false,
+    "relative_order": 12,
+    "properties": {
+        "cursorPosition": "14,0",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1576277136,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1576277136,
+    "read_only": false,
+    "read_only_alternatives": []
+}

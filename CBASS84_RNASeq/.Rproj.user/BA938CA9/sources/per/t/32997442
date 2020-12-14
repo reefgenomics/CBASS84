@@ -1,0 +1,24 @@
+{
+    "id": "32997442",
+    "path": "~/Documents/GitHub/CBASS84/CBASS84_RNASeq/RNASeq_Analysis/code/plot_pca.R",
+    "project_path": "RNASeq_Analysis/code/plot_pca.R",
+    "type": "r_source",
+    "hash": "1169653675",
+    "contents": "",
+    "dirty": false,
+    "created": 1600195834057.0,
+    "source_on_save": false,
+    "relative_order": 8,
+    "properties": {
+        "cursorPosition": "12,34",
+        "scrollLine": "2"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1600220071,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1600220071066,
+    "read_only": false,
+    "read_only_alternatives": []
+}

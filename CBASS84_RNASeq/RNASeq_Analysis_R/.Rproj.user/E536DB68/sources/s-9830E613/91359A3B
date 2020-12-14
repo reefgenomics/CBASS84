@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1601317640525.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "91359A3B",
+    "lastKnownWriteTime" : 1600800059,
+    "last_content_update" : 1600800059,
+    "path" : "/Volumes/omics4tb2/Collaborations/Vulcan/RNASeq_Analysis/code/import_kallisto2DESeq.R",
+    "project_path" : "code/import_kallisto2DESeq.R",
+    "properties" : {
+        "cursorPosition" : "21,27",
+        "scrollLine" : "18"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

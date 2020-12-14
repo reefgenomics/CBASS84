@@ -1,0 +1,131 @@
+---
+title: "Regulon Activity"
+author: "Serdar Turkarslan"
+date: "9/8/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library('tidyverse')
+library('DT')
+source('code/get_network_activity.R')
+source('code/compare_activity_conditions.R')
+source('code/get_regulon_genes.R')
+source('code/cluster_enrichment.R')
+```
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+regulon.activity <- get_network_activity()
+```
+
+
+# hFOB.MM1S T0 vs MM1S T0 {.tabset}
+Most active regulons in Co-cultures at T0 vs mono culture at T0
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+coT0vsmonoT0 <- compare_activity_condition(my.condition1 = "hFOB.MM1S_0hr", my.condition2 = "MM1S_0hr",direction = "active")
+
+## High risk Regulons Only active in Co T0
+hr.coT0 <- setdiff(coT0vsmonoT0$condition1.highrisk.regulons, coT0vsmonoT0$condition2.highrisk.regulons)
+
+## GET MEAN Z-SCORE AND RA NK ORDER AND GET TOP 10 
+hr.coT0.df <- regulon.activity$samples.active.collapsed %>%
+  filter(sample =="hFOB.MM1S_0hr" & regulons %in% hr.coT0 ) %>%
+  arrange(desc(mean_zscore)) %>%
+  top_n(10)
+
+```
+
+## Genes 
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+#Get regulon genes and perform enrichments 
+## Get regulon genes for top 10 active regulons
+my.genes <- get_regulon_genes(hr.coT0.df$regulons)
+
+## Enrichment for top 10 active regulons
+hr.coT0.enrichment <- cluster_enrichment(my.genes = my.genes)
+datatable(my.genes)
+```
+
+## Hallmarks
+```{r, echo=FALSE,warning=FALSE,message=FALSE,results='asis'}
+hr.coT0.enrichment$hallmark
+print(htmltools::tagList(datatable(hr.coT0.enrichment$table1,rownames = F,escape = F)))
+datatable(hr.coT0.enrichment$table1)
+```
+
+## Immuno
+```{r, echo=FALSE,warning=FALSE,message=FALSE,results='asis'}
+hr.coT0.enrichment$immuno
+print(htmltools::tagList(datatable(hr.coT0.enrichment$table2,rownames = F,escape = F)))
+datatable(hr.coT0.enrichment$table2)
+```
+
+## Onco
+```{r, echo=FALSE,warning=FALSE,message=FALSE,results='asis'}
+hr.coT0.enrichment$onco
+print(htmltools::tagList(datatable(hr.coT0.enrichment$table3,rownames = F,escape = F)))
+datatable(hr.coT0.enrichment$table3)
+```
+
+## Curated
+```{r, echo=FALSE,warning=FALSE,message=FALSE,results='asis'}
+hr.coT0.enrichment$curated
+print(htmltools::tagList(datatable(hr.coT0.enrichment$table4,rownames = F,escape = F)))
+datatable(hr.coT0.enrichment$table4)
+```
+
+# MM1S T0 vs hFOB.MM1S T0 {.tabset}
+Most active regulons in Mono-cultures at T0 vs co-culture at T0
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+coT0vsmonoT0 <- compare_activity_condition(my.condition1 = "hFOB.MM1S_0hr", my.condition2 = "MM1S_0hr",direction = "active")
+
+## High risk Regulons Only active in Co T0
+hr.monoT0 <- setdiff(coT0vsmonoT0$condition2.highrisk.regulons,coT0vsmonoT0$condition1.highrisk.regulons)
+
+## GET MEAN Z-SCORE AND RA NK ORDER AND GET TOP 10 
+hr.monoT0.df <- regulon.activity$samples.active.collapsed %>%
+  filter(sample =="MM1S_0hr" & regulons %in% hr.monoT0 ) %>%
+  arrange(desc(mean_zscore)) %>%
+  top_n(10)
+
+```
+
+## Genes 
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+#Get regulon genes and perform enrichments 
+## Get regulon genes for top 10 active regulons
+my.genes <- get_regulon_genes(hr.monoT0.df$regulons)
+
+## Enrichment for top 10 active regulons
+hr.monoT0.enrichment <- cluster_enrichment(my.genes = my.genes)
+datatable(my.genes)
+```
+
+## Hallmarks
+```{r, echo=FALSE,warning=FALSE,message=FALSE,results='asis'}
+hr.monoT0.enrichment$hallmark
+print(htmltools::tagList(datatable(hr.monoT0.enrichment$table1,rownames = F,escape = F)))
+datatable(hr.monoT0.enrichment$table1)
+```
+
+## Immuno
+```{r, echo=FALSE,warning=FALSE,message=FALSE,results='asis'}
+hr.monoT0.enrichment$immuno
+print(htmltools::tagList(datatable(hr.monoT0.enrichment$table2,rownames = F,escape = F)))
+datatable(hr.monoT0.enrichment$table2)
+```
+
+## Onco
+```{r, echo=FALSE,warning=FALSE,message=FALSE,results='asis'}
+hr.monoT0.enrichment$onco
+print(htmltools::tagList(datatable(hr.monoT0.enrichment$table3,rownames = F,escape = F)))
+datatable(hr.monoT0.enrichment$table3)
+```
+
+## Curated
+```{r, echo=FALSE,warning=FALSE,message=FALSE,results='asis'}
+hr.monoT0.enrichment$curated
+print(htmltools::tagList(datatable(hr.monoT0.enrichment$table4,rownames = F,escape = F)))
+datatable(hr.monoT0.enrichment$table4)
+```
+

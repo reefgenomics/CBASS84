@@ -1,0 +1,8 @@
+"0","org=""Spis"""
+"0","x <- plot_topn_heatmap(org = ""Spis"",n = 50,dds=deseq_data$dds.Spis)"
+"1","Creating Heatmap for :"
+"1"," "
+"1","Spis"
+"1"," "
+"1","
+"

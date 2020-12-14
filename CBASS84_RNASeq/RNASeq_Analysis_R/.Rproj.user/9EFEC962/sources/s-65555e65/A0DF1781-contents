@@ -1,0 +1,77 @@
+my.dir <- "/mnt/omics4tb2-serdar/Collaborations/Vulcan/data/181203_K00235_0152_BHWNJ7BBXX_CBASS84_RNASeq"
+sample_id <- dir(file.path(my.dir))
+
+# remove folders for samples with issues and other script folders also remove ES1-36A since it seems to have very high number of reads across samples.
+sample_id <- sample_id[!(sample_id %in% c("Lanes_metadata", "ES1-36A","S6-P-ST-36B","KS2-33A","ES3-33A","all_htseqcounts", "label_changes_README.txt"))]
+
+# list of abundance files.
+files <- file.path(my.dir, sample_id, "results0920_kallisto_Spis_Smic", "abundance.h5")
+names(files) <- sample_id
+cat("\t\t - Collected abundance files for ", length(files), "files\n\n")
+
+## Collect sample metadata and prepare sample table
+cat("\t - Collecting meta-data informatioon for samples and creating sample table\n\n")
+# get metadata info from metadata worksheet and select relevant columns and delete NA rows
+meta_data <- read.delim("/mnt/omics4tb2-serdar/Collaborations/Vulcan/data/CBASS84_ExperimentalDesign_SampleIDs.txt", header=T, sep="\t", stringsAsFactors = F)
+meta_data <- dplyr::select(meta_data, sample = Sample.Name.CBASS84, 1:20)
+
+# remove samples from metadata that were earlier filtered and order
+meta_data <- meta_data[grep("(S6_P_ST_36B|KS2_33A|ES3_33A|ES6_30A|ES1_36A)", meta_data$sample, invert=T),]
+meta_data <- meta_data[order(meta_data$sample),]
+meta_data$Temp <- as.factor(meta_data$Temp)
+
+# create a metadata column by combining temperature and Reef.site.name
+meta_data$condition <- as.factor(paste(meta_data$Temp, meta_data$Reef.Site.Name, sep="_"))
+meta_data <- dplyr::mutate(meta_data, path = files)
+
+#rebuild_sample table
+sampleTable <- cbind(sampleName=sample_id, fileName=files, meta_data)
+
+
+
+lfc = 2
+condition = "condition_33_ICN_vs_30_ICN"
+condition2 = "condition_30_ICN_vs_33_ICN"
+
+cond0 <- strsplit(paste(condition, sep=""), split = "condition_")[[1]][2]
+cond1 <- strsplit(cond0, split = "_vs_")[[1]][1]
+cond2 <- strsplit(cond0, split = "_vs_")[[1]][2]
+
+cat("\t\t Cond1:", cond1, " Cond2:", cond2, "\n")
+
+
+txi.kallisto <- tximport(files, type = "kallisto", txOut = TRUE)
+
+dds <- DESeqDataSetFromTximport(txi.kallisto, sampleTable, ~condition)
+dds.Spis <- dds[grep("Spis", rownames(dds)),]
+
+Condition1
+dds.Spis$condition <- relevel(dds.Spis$condition, ref = cond2)
+dds.Spis <- DESeq(dds.Spis)
+resLFC1 <- lfcShrink(dds = dds.Spis,
+                     #contrast = c(condition, cond1, cond2),
+                     coef = condition,
+                     type="apeglm",
+                     lfcThreshold = lfc,parallel = F,BPPARAM = MulticoreParam(8) )
+
+Condition2
+condition = "condition_30_ICN_vs_33_ICN"
+
+cond00 <- strsplit(paste(condition, sep=""), split = "condition_")[[1]][2]
+cond11 <- strsplit(cond00, split = "_vs_")[[1]][1]
+cond22 <- strsplit(cond00, split = "_vs_")[[1]][2]
+
+dds.Spis$condition <- relevel(dds.Spis$condition, ref = cond22)
+dds.Spis2 <- DESeq(dds.Spis)
+resLFC2 <- lfcShrink(dds = dds.Spis2,
+                     #contrast = c(condition, cond1, cond2),
+                     coef = condition,
+                     type="apeglm",
+                     lfcThreshold = lfc,parallel = F,BPPARAM = MulticoreParam(8) )
+
+
+
+
+res1 <- results(dds.Spis,contrast = c(condition, cond1, cond2))
+
+
