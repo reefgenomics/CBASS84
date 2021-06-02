@@ -1,0 +1,85 @@
+ID	Region	Comparison	Temperature	Genotype	new_ID
+ES1-30A	ICN	Long-scale	30	G1	 ICN1-30 
+ES1-33A	ICN	Long-scale	33	G1	 ICN1-33 
+ES1-36A	ICN	Long-scale	36	G1	 ICN1-36 
+ES2-30A	ICN	Long-scale	30	G2	 ICN2-30 
+ES2-33A	ICN	Long-scale	33	G2	 ICN2-33 
+ES2-36A	ICN	Long-scale	36	G2	 ICN2-36 
+ES3-30A	ICN	Long-scale	30	G3	 ICN3-30 
+ES3-33A	ICN	Long-scale	33	G3	 ICN3-33 
+ES3-36A	ICN	Long-scale	36	G3	 ICN3-36 
+ES4-30A	ICN	Long-scale	30	G4	 ICN4-30 
+ES4-33A	ICN	Long-scale	33	G4	 ICN4-33 
+ES4-36A	ICN	Long-scale	36	G4	 ICN4-36 
+ES5-30A	ICN	Long-scale	30	G5	 ICN5-30 
+ES5-33A	ICN	Long-scale	33	G5	 ICN5-33 
+ES5-36A	ICN	Long-scale	36	G5	 ICN5-36 
+ES6-30A	ICN	Long-scale	30	G6	 ICN6-30 
+ES6-33A	ICN	Long-scale	33	G6	 ICN6-33 
+ES6-36A	ICN	Long-scale	36	G6	 ICN6-36 
+ES7-30A	ICN	Long-scale	30	G7	 ICN7-30 
+ES7-33A	ICN	Long-scale	33	G7	 ICN7-33 
+ES7-36A	ICN	Long-scale	36	G7	 ICN7-36 
+KS1-30A	Al Fahal	Long-scale	30	G1	 AF1-30 
+KS1-33A	Al Fahal	Long-scale	33	G1	 AF1-33 
+KS1-36A	Al Fahal	Long-scale	36	G1	 AF1-36 
+KS2-30A	Al Fahal	Long-scale	30	G2	 AF2-30 
+KS2-33A	Al Fahal	Long-scale	33	G2	 AF2-33 
+KS2-36A	Al Fahal	Long-scale	36	G2	 AF2-36 
+KS3-30A	Al Fahal	Long-scale	30	G3	 AF3-30 
+KS3-33A	Al Fahal	Long-scale	33	G3	 AF3-33 
+KS3-36A	Al Fahal	Long-scale	36	G3	 AF3-36 
+KS4-30A	Al Fahal	Long-scale	30	G4	 AF4-30 
+KS4-33A	Al Fahal	Long-scale	33	G4	 AF4-33 
+KS4-36A	Al Fahal	Long-scale	36	G4	 AF4-36 
+KS5-30A	Al Fahal	Long-scale	30	G5	 AF5-30 
+KS5-33A	Al Fahal	Long-scale	33	G5	 AF5-33 
+KS5-36A	Al Fahal	Long-scale	36	G5	 AF5-36 
+KS6-30A	Al Fahal	Long-scale	30	G6	 AF6-30 
+KS6-33A	Al Fahal	Long-scale	33	G6	 AF6-33 
+KS6-36A	Al Fahal	Long-scale	36	G6	 AF6-36 
+KS7-30A	Al Fahal	Long-scale	30	G7	 AF7-30 
+KS7-33A	Al Fahal	Long-scale	33	G7	 AF7-33 
+KS7-36A	Al Fahal	Long-scale	36	G7	 AF7-36 
+S1-E-ST-30B	Exposed Site Tahala	Short-scale	30	G1	 ExT1-30 
+S1-E-ST-33B	Exposed Site Tahala	Short-scale	33	G1	 ExT1-33 
+S1-E-ST-36B	Exposed Site Tahala	Short-scale	36	G1	 ExT1-36 
+S1-P-ST-30B	Protected Site Tahala	Short-scale	30	G1	 PrT1-30 
+S1-P-ST-33B	Protected Site Tahala	Short-scale	33	G1	 PrT1-33 
+S1-P-ST-36B	Protected Site Tahala	Short-scale	36	G1	 PrT1-36 
+S2-E-ST-30B	Exposed Site Tahala	Short-scale	30	G2	 ExT2-30 
+S2-E-ST-33B	Exposed Site Tahala	Short-scale	33	G2	 ExT2-33 
+S2-E-ST-36B	Exposed Site Tahala	Short-scale	36	G2	 ExT2-36 
+S2-P-ST-30B	Protected Site Tahala	Short-scale	30	G2	 PrT2-30 
+S2-P-ST-33B	Protected Site Tahala	Short-scale	33	G2	 PrT2-33 
+S2-P-ST-36B	Protected Site Tahala	Short-scale	36	G2	 PrT2-36 
+S3-E-ST-30B	Exposed Site Tahala	Short-scale	30	G3	 ExT3-30 
+S3-E-ST-33B	Exposed Site Tahala	Short-scale	33	G3	 ExT3-33 
+S3-E-ST-36B	Exposed Site Tahala	Short-scale	36	G3	 ExT3-36 
+S3-P-ST-30B	Protected Site Tahala	Short-scale	30	G3	 PrT3-30 
+S3-P-ST-33B	Protected Site Tahala	Short-scale	33	G3	 PrT3-33 
+S3-P-ST-36B	Protected Site Tahala	Short-scale	36	G3	 PrT3-36 
+S4-E-ST-30B	Exposed Site Tahala	Short-scale	30	G4	 ExT4-30 
+S4-E-ST-33B	Exposed Site Tahala	Short-scale	33	G4	 ExT4-33 
+S4-E-ST-36B	Exposed Site Tahala	Short-scale	36	G4	 ExT4-36 
+S4-P-ST-30B	Protected Site Tahala	Short-scale	30	G4	 PrT4-30 
+S4-P-ST-33B	Protected Site Tahala	Short-scale	33	G4	 PrT4-33 
+S4-P-ST-36B	Protected Site Tahala	Short-scale	36	G4	 PrT4-36 
+S5-E-ST-30B	Exposed Site Tahala	Short-scale	30	G5	 ExT5-30 
+S5-E-ST-33B	Exposed Site Tahala	Short-scale	33	G5	 ExT5-33 
+S5-E-ST-36B	Exposed Site Tahala	Short-scale	36	G5	 ExT5-36 
+S5-P-ST-30B	Protected Site Tahala	Short-scale	30	G5	 PrT5-30 
+S5-P-ST-33B	Protected Site Tahala	Short-scale	33	G5	 PrT5-33 
+S5-P-ST-36B	Protected Site Tahala	Short-scale	36	G5	 PrT5-36 
+S6-E-ST-30B	Exposed Site Tahala	Short-scale	30	G6	 ExT6-30 
+S6-E-ST-33B	Exposed Site Tahala	Short-scale	33	G6	 ExT6-33 
+S6-E-ST-36B	Exposed Site Tahala	Short-scale	36	G6	 ExT6-36 
+S6-P-ST-30B	Protected Site Tahala	Short-scale	30	G6	 PrT6-30 
+S6-P-ST-33B	Protected Site Tahala	Short-scale	33	G6	 PrT6-33 
+S6-P-ST-36B	Protected Site Tahala	Short-scale	36	G6	 PrT6-36 
+S7-E-ST-30B	Exposed Site Tahala	Short-scale	30	G7	 ExT7-30 
+S7-E-ST-33B	Exposed Site Tahala	Short-scale	33	G7	 ExT7-33 
+S7-E-ST-36B	Exposed Site Tahala	Short-scale	36	G7	 ExT7-36 
+S7-P-ST-30B	Protected Site Tahala	Short-scale	30	G7	 PrT7-30 
+S7-P-ST-33B	Protected Site Tahala	Short-scale	33	G7	 PrT7-33 
+S7-P-ST-36B	Protected Site Tahala	Short-scale	36	G7	 PrT7-36 
