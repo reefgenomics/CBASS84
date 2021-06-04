@@ -50,15 +50,15 @@ As output from the code:
 
 ![](svg_figs_for_md_doc/eighty_four_sample_profile_dists_and_seq_info_updated_samplenames.svg)
 
-Final for ms:
-
-![](svg_figs_for_md_doc/eighty_four_sample_profile_dists_and_seq_info_illustrator_updated_samplenames.svg)
-
 #### The map figure
 As output from the code:
 
 ![](svg_figs_for_md_doc/eighty_four_map.svg)
 
+
+#### Final for ms:
+
+![](svg_figs_for_md_doc/final_fig_2.svg)
 
 
 
